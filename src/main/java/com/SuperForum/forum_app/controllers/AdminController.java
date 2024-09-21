@@ -17,6 +17,7 @@ public class AdminController {
     @PostMapping("/category")
     public ResponseEntity<CategoryDto> postCategory(@RequestBody CategoryDto categoryDto){
         CategoryDto createdCategoryDto = adminService.postCategory(categoryDto);
+        System.out.println(categoryDto);
         if (createdCategoryDto == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(createdCategoryDto);
     }
