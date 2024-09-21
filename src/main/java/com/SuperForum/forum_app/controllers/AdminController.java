@@ -15,11 +15,16 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/category")
-    public ResponseEntity<CategoryDto> postCategory(@RequestBody CategoryDto categoryDto){
+    public ResponseEntity<CategoryDto> postCategory(@RequestBody CategoryDto categoryDto) {
+        System.out.println("Received category DTO: " + categoryDto);
         CategoryDto createdCategoryDto = adminService.postCategory(categoryDto);
-        System.out.println(categoryDto);
-        if (createdCategoryDto == null) return ResponseEntity.notFound().build();
+        System.out.println("Created category DTO: " + createdCategoryDto);
+
+        if (createdCategoryDto == null) {
+            System.out.println("Category already exists. Returning 404.");
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok(createdCategoryDto);
     }
-
 }

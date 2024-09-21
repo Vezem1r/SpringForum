@@ -29,7 +29,7 @@ public class AdminServiceImpl implements AdminService{
         category.setDescription(categoryDto.getDescription());
         Category createdCategory = categoryRepository.save(category);
         CategoryDto createdCategoryDto = new CategoryDto();
-        //createdCategoryDto.setCategoryId(createdCategory.getCategoryId());
+        createdCategoryDto.setCategoryId(createdCategory.getCategoryId());
         createdCategoryDto.setName(createdCategory.getName());
         createdCategoryDto.setDescription(createdCategory.getDescription());
         return createdCategoryDto;
