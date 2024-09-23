@@ -23,7 +23,8 @@ public class Attachment {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "attachment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne
+    @JoinColumn(name = "topic_id")
     private Topic topic;
 
     @ManyToOne(fetch = FetchType.LAZY)

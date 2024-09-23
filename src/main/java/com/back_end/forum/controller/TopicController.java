@@ -37,12 +37,7 @@ public class TopicController {
         topicDto.setCategoryId(categoryId);
         topicDto.setTagNames(tagNames);
 
-        if (attachment != null) {
-            Attachment savedAttachment = attachmentService.saveAttachment(attachment, null, null);
-            topicDto.setAttachmentId(savedAttachment.getId());
-        }
-
-        Topic createdTopic = topicService.createTopic(topicDto);
+        Topic createdTopic = topicService.createTopic(topicDto, attachment);
         return ResponseEntity.ok(createdTopic);
     }
 }

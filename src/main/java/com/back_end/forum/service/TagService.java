@@ -44,7 +44,9 @@ public class TagService {
                 newTag.setName(tagName);
                 return tagRepository.save(newTag);
             });
-            tags.add(tag);
+            if (!tags.contains(tag)) {
+                tags.add(tag);
+            }
         }
         return tags;
     }

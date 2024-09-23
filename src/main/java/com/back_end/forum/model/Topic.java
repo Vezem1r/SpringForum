@@ -47,7 +47,7 @@ public class Topic {
     )
     private Set<Tag> tags;
 
-    @OneToOne
-    @JoinColumn(name = "attachment_id")
-    private Attachment attachment;
+
+//    @OneToOne(mappedBy = "topic", cascade = CascadeType.ALL)
+//    private Attachment attachment;
 }

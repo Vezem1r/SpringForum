@@ -31,10 +31,11 @@ public class AttachmentService {
 
         byte[] resizedImage = ImageUtils.resizeAndCompressImage(file);
         attachment.setData(resizedImage);
-
+        System.out.println("Starts saving");
         if (topicId != null) {
             Topic topic = topicRepository.findById(topicId)
                     .orElseThrow(() -> new RuntimeException("Topic not found"));
+            System.out.println("Setting topic to attachment" + topic);
             attachment.setTopic(topic);
         } else if (commentId != null) {
             Comment comment = commentRepository.findById(commentId)

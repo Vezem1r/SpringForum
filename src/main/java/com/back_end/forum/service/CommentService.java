@@ -52,7 +52,7 @@ public class CommentService {
         List<Attachment> savedAttachments = new ArrayList<>();
         if (attachments != null) {
             for (MultipartFile attachment : attachments) {
-                savedAttachments.add(attachmentService.saveAttachment(attachment, null, null));
+                savedAttachments.add(attachmentService.saveAttachment(attachment, null, savedComment.getCommentId()));
             }
         }
         savedComment.setAttachments(savedAttachments);

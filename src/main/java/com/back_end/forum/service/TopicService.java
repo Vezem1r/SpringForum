@@ -11,10 +11,13 @@ import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +28,9 @@ public class TopicService {
     private final CategoryRepository categoryRepository;
     private final AttachmentRepository attachmentRepository;
     private final TagService tagService;
+    private final AttachmentService attachmentService;
 
-    public Topic createTopic(TopicDto topicDTO) {
+    public Topic createTopic(TopicDto topicDTO, MultipartFile attachment) throws IOException {
         Topic topic = new Topic();
         topic.setTitle(topicDTO.getTitle());
         topic.setContent(topicDTO.getContent());
@@ -40,16 +44,19 @@ public class TopicService {
         topic.setCategory(categoryRepository.findById(topicDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found")));
 
-        if (topicDTO.getAttachmentId() != null) {
-            Attachment attachment = attachmentRepository.findById(topicDTO.getAttachmentId())
-                    .orElseThrow(() -> new RuntimeException("Attachment not found"));
-            topic.setAttachment(attachment);
-        }
-
         Set<Tag> tags = tagService.getOrCreateTags(topicDTO.getTagNames());
         topic.setTags(tags);
 
-        return topicRepository.save(topic);
+        Topic savedtopic = topicRepository.save(topic);
+        System.out.println("Topic id" + savedtopic.getTopicId());
+
+        if (attachment != null) {
+            //Attachment savedAttachment = attachmentService.saveAttachment(attachment, savedtopic.getTopicId(), null);
+            attachmentService.saveAttachment(attachment, savedtopic.getTopicId(), null);
+            //savedtopic.setAttachment(savedAttachment);
+        }
+
+        return savedtopic;
     }
 
     public List<Topic> getAllTopics() {
