@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,4 +36,16 @@ public class TagService {
         return category;
     }
 
+    public Set<Tag> getOrCreateTags(List<String> tagNames) {
+        Set<Tag> tags = new HashSet<>();
+        for (String tagName : tagNames) {
+            Tag tag = tagRepository.findByName(tagName).orElseGet(() -> {
+                Tag newTag = new Tag();
+                newTag.setName(tagName);
+                return tagRepository.save(newTag);
+            });
+            tags.add(tag);
+        }
+        return tags;
+    }
 }

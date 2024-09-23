@@ -1,7 +1,11 @@
 package com.back_end.forum.service;
 
 import com.back_end.forum.model.Attachment;
+import com.back_end.forum.model.Comment; // Импортируем ваш собственный класс Comment
+import com.back_end.forum.model.Topic;
 import com.back_end.forum.repository.AttachmentRepository;
+import com.back_end.forum.repository.CommentRepository;
+import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.utils.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,8 @@ import java.time.LocalDateTime;
 public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
+    private final TopicRepository topicRepository;
+    private final CommentRepository commentRepository;
 
     public Attachment saveAttachment(MultipartFile file, Long topicId, Long commentId) throws IOException {
         Attachment attachment = new Attachment();
@@ -23,21 +29,24 @@ public class AttachmentService {
         attachment.setSize(file.getSize());
         attachment.setCreatedAt(LocalDateTime.now());
 
-        //if it is topic we have to rezise immage to use it after as topic banner
+        byte[] resizedImage = ImageUtils.resizeAndCompressImage(file);
+        attachment.setData(resizedImage);
+
         if (topicId != null) {
-            byte[] resizedImage = ImageUtils.resizeAndCompressImage(file);
-            attachment.setData(resizedImage);
-            attachment.setTopicId(topicId);
-        } else {
-            //if it is comment
-            attachment.setData(file.getBytes());
-            attachment.setCommentId(commentId);
+            Topic topic = topicRepository.findById(topicId)
+                    .orElseThrow(() -> new RuntimeException("Topic not found"));
+            attachment.setTopic(topic);
+        } else if (commentId != null) {
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new RuntimeException("Comment not found"));
+            attachment.setComment(comment);
         }
 
         return attachmentRepository.save(attachment);
     }
 
     public Attachment getAttachment(Long id) {
-        return attachmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Attachment not found"));
+        return attachmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Attachment not found"));
     }
 }

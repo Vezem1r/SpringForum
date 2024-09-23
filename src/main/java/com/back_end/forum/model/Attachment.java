@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import com.back_end.forum.model.Comment;
 
 @Data
 @Entity
@@ -22,6 +23,10 @@ public class Attachment {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    private Long topicId;
-    private Long commentId;
+    @OneToOne(mappedBy = "attachment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Topic topic;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 }
