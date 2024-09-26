@@ -1,4 +1,4 @@
-package com.back_end.forum.controller;
+package com.back_end.forum.controller.admin;
 
 import com.back_end.forum.dto.CategoryDto;
 import com.back_end.forum.model.Category;
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/category")
+@RequestMapping("/admin/category")
 @RestController
 @RequiredArgsConstructor
 public class CategoryController {

@@ -23,10 +23,4 @@ public class TagController {
         System.out.println("Tag has been created");
         return ResponseEntity.ok(createdTag);
     }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteTag(@PathVariable Long id){
-        Tag deletedTag =  tagService.deleteTag(id);
-        return ResponseEntity.ok("Tag has been removed");
-    }
 }

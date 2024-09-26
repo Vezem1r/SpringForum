@@ -24,6 +24,7 @@ public class CommentController {
             @RequestParam(value = "parentId", required = false) Long parentId,
             @RequestParam(value = "attachments", required = false) MultipartFile[] attachments) throws IOException {
 
+        System.out.println("Received topicId: " + topicId);
         CommentDto commentDto = new CommentDto();
         commentDto.setContent(content);
         commentDto.setUserId(userId);

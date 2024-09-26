@@ -7,8 +7,6 @@ import com.back_end.forum.model.User;
 import com.back_end.forum.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,7 +50,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
         user.setLastLogin(LocalDateTime.now());
-        user.setVerificationCode(generateVerificationCode());        user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
+        user.setVerificationCode(generateVerificationCode());
+        user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
         sendVerificationEmail(user);
         return userRepository.save(user);

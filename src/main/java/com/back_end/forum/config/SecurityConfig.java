@@ -15,6 +15,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static com.back_end.forum.model.enums.Permission.*;
+import static com.back_end.forum.model.enums.RolesEnum.ADMIN;
+import static com.back_end.forum.model.enums.RolesEnum.MODERATOR;
+import static org.springframework.http.HttpMethod.*;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

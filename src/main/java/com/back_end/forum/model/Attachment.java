@@ -17,8 +17,9 @@ public class Attachment {
     private String filename;
     private String contentType;
     private Long size;
-    @Lob
-    private byte[] data; //file in db
+
+    @Column(nullable = false)
+    private String filePath;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

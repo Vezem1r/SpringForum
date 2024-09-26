@@ -3,23 +3,26 @@ package com.back_end.forum.utils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ImageUtils {
 
-    public static byte[] resizeAndCompressImage(MultipartFile file) throws IOException {
-        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+    public static byte[] resizeAndCompressImage(MultipartFile imageFile) throws IOException {
+        BufferedImage originalImage = ImageIO.read(imageFile.getInputStream());
 
-        // Resize
-        int targetWidth = 800;
-        int targetHeight = 600;
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-        resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(targetWidth, targetHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+        int width = 1024;
+        int height = 1024;
+        BufferedImage resizedImage = new BufferedImage(width, height, originalImage.getType());
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(originalImage, 0, 0, width, height, null);
+        g2d.dispose();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", baos);
-        return baos.toByteArray();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(resizedImage, "jpg", byteArrayOutputStream);
+
+        return byteArrayOutputStream.toByteArray();
     }
 }

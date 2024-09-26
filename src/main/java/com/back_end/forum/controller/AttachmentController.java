@@ -34,8 +34,13 @@ public class AttachmentController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Attachment> getAttachment(@PathVariable Long id) {
+    public ResponseEntity<byte[]> getAttachmentFile(@PathVariable Long id) {
         Attachment attachment = attachmentService.getAttachment(id);
-        return ResponseEntity.ok(attachment);
+        try {
+            byte[] fileContent = attachmentService.getFileContent(attachment.getFilePath());
+            return ResponseEntity.ok(fileContent);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
