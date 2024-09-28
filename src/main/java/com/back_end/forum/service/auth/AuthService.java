@@ -3,6 +3,7 @@ package com.back_end.forum.service.auth;
 import com.back_end.forum.dto.Auth.LoginUserDto;
 import com.back_end.forum.dto.Auth.RegisterUserDto;
 import com.back_end.forum.dto.Auth.VerifyUserDto;
+import com.back_end.forum.exception.BadRequest;
 import com.back_end.forum.model.User;
 import com.back_end.forum.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -34,14 +35,23 @@ public class AuthService {
     public User signup(RegisterUserDto registerUserDto){
 
         Optional<User> existingUserByUsername = userRepository.findByUsername(registerUserDto.getUsername());
-        Optional<User> existingUserByEmail = userRepository.findByEmail(registerUserDto.getEmail());
-
         if (existingUserByUsername.isPresent()) {
-            throw new RuntimeException("User with this username already exists");
+            User userByUsername = existingUserByUsername.get();
+            if (userByUsername.isEnabled()) {
+                throw new BadRequest("User with this username already exists.");
+            } else {
+                userRepository.delete(userByUsername);
+            }
         }
 
+        Optional<User> existingUserByEmail = userRepository.findByEmail(registerUserDto.getEmail());
         if (existingUserByEmail.isPresent()) {
-            throw new RuntimeException("User with this email already exists");
+            User userByEmail = existingUserByEmail.get();
+            if (userByEmail.isEnabled()) {
+                throw new BadRequest("User with this email already exists.");
+            } else {
+                userRepository.delete(userByEmail);
+            }
         }
 
         User user = new User();
@@ -59,6 +69,7 @@ public class AuthService {
 
     public User authenticate(LoginUserDto loginUserDto){
         String usernameOrEmail = loginUserDto.getUsernameOrEmail();
+        System.out.println("Received login request: " + loginUserDto);
         System.out.println("Attempting to authenticate user: " + usernameOrEmail);
         Optional<User> optionalUser;
 
@@ -82,7 +93,7 @@ public class AuthService {
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginUserDto.getUsernameOrEmail(),
+                        usernameOrEmail,
                         loginUserDto.getPassword()
                 )
         );

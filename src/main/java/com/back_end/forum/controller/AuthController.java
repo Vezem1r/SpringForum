@@ -27,6 +27,7 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<LoginResponse> signin(@RequestBody LoginUserDto loginUserDto){
+        System.out.println("Received login request: " + loginUserDto);
         User authenticatedUser = authService.authenticate(loginUserDto);
         String jwtToken = jwtService.generateToken(authenticatedUser);
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());

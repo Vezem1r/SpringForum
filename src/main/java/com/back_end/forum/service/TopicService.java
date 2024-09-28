@@ -4,8 +4,8 @@ import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.model.Tag;
-import com.back_end.forum.model.Attachment;
-import com.back_end.forum.repository.AttachmentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.back_end.forum.repository.CategoryRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import java.io.IOException;
 
@@ -26,7 +25,6 @@ public class TopicService {
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final AttachmentRepository attachmentRepository;
     private final TagService tagService;
     private final AttachmentService attachmentService;
 
@@ -59,10 +57,9 @@ public class TopicService {
         return savedtopic;
     }
 
-    public List<Topic> getAllTopics() {
-        return topicRepository.findAll();
+    public Page<Topic> getAllTopics(Pageable pageable) {
+        return topicRepository.findAll(pageable);
     }
-
     public Topic getTopicById(Long id) {
         return topicRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found"));

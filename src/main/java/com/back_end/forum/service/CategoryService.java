@@ -7,6 +7,7 @@ import com.back_end.forum.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,4 +49,8 @@ public class CategoryService {
 
         return categoryRepository.save(category);
     }
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
 }
