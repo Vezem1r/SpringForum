@@ -49,9 +49,7 @@ public class TopicService {
         System.out.println("Topic id" + savedtopic.getTopicId());
 
         if (attachment != null) {
-            //Attachment savedAttachment = attachmentService.saveAttachment(attachment, savedtopic.getTopicId(), null);
             attachmentService.saveAttachment(attachment, savedtopic.getTopicId(), null);
-            //savedtopic.setAttachment(savedAttachment);
         }
 
         return savedtopic;
@@ -60,8 +58,50 @@ public class TopicService {
     public Page<Topic> getAllTopics(Pageable pageable) {
         return topicRepository.findAll(pageable);
     }
-    public Topic getTopicById(Long id) {
-        return topicRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Topic not found"));
+    public Optional<Topic> getTopicById(Long topicId) {
+        return topicRepository.findById(topicId);
+    }
+
+    public List<Topic> getTopicsByCategory(Long categoryId) {
+        List<Topic> topics = topicRepository.findByCategory_CategoryId(categoryId);
+        topics.forEach(topic -> System.out.println("Topic: " + topic.getTitle()));
+        return topics;
+    }
+
+    public List<Topic> searchTopics(Optional<Long> categoryId, Optional<String> title,
+                                    Optional<LocalDateTime> startDate, Optional<LocalDateTime> endDate,
+                                    Optional<String> sortBy, Optional<List<String>> tagNames) {
+
+        if (categoryId.isPresent()) {
+            return topicRepository.findByCategory_CategoryId(categoryId.get());
+        }
+
+        if (title.isPresent()) {
+            return topicRepository.findByTitleContainingIgnoreCase(title.get());
+        }
+
+        if (startDate.isPresent() && endDate.isPresent()) {
+            return topicRepository.findByCreatedAtBetween(startDate.get(), endDate.get());
+        }
+
+        if (tagNames.isPresent()) {
+            List<Long> tagIds = tagService.getTagIdsByName(tagNames.get());
+            return topicRepository.findByTags(tagIds, (long) tagIds.size());
+        }
+
+        if (sortBy.isPresent()) {
+            switch (sortBy.get()) {
+                case "createdAsc":
+                    return topicRepository.findByOrderByCreatedAtAsc();
+                case "createdDesc":
+                    return topicRepository.findByOrderByCreatedAtDesc();
+                case "updatedAsc":
+                    return topicRepository.findByOrderByUpdatedAtAsc();
+                case "updatedDesc":
+                    return topicRepository.findByOrderByUpdatedAtDesc();
+            }
+        }
+
+        return Collections.emptyList();
     }
 }

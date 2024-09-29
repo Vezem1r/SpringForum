@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,5 +50,12 @@ public class TagService {
             }
         }
         return tags;
+    }
+
+    public List<Long> getTagIdsByName(List<String> tagNames) {
+        List<Tag> tags = tagRepository.findByNames(tagNames);
+        return tags.stream()
+                .map(Tag::getTagId)
+                .collect(Collectors.toList());
     }
 }

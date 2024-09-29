@@ -4,9 +4,11 @@ import com.back_end.forum.dto.CategoryDto;
 import com.back_end.forum.exception.BadRequest;
 import com.back_end.forum.model.Category;
 import com.back_end.forum.repository.CategoryRepository;
+import com.back_end.forum.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TopicRepository topicRepository;
 
     public Category createCategory(CategoryDto categoryDto){
         Optional<Category> optionalCategory = categoryRepository.findByName(categoryDto.getName());

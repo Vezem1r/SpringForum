@@ -1,7 +1,7 @@
 package com.back_end.forum.service;
 
 import com.back_end.forum.model.Attachment;
-import com.back_end.forum.model.Comment; // Импортируем ваш собственный класс Comment
+import com.back_end.forum.model.Comment;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.repository.CommentRepository;

@@ -25,7 +25,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final TopicRepository topicRepository;
-    private final AttachmentRepository attachmentRepository;
     private final AttachmentService attachmentService;
 
     public Comment createComment(CommentDto commentDto, MultipartFile[] attachments) throws IOException {

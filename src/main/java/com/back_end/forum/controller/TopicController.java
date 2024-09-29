@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/topics")
@@ -27,7 +28,15 @@ public class TopicController {
 
     private final TopicService topicService;
     private final UserRepository userRepository;
-    private final AttachmentService attachmentService;
+
+    @GetMapping
+    public ResponseEntity<List<Topic>> getTopicsByCategory(@RequestParam Long categoryId) {
+        List<Topic> topics = topicService.getTopicsByCategory(categoryId);
+        if (topics.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(topics);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<Topic> createTopic(
@@ -52,4 +61,6 @@ public class TopicController {
         Topic createdTopic = topicService.createTopic(topicDto, attachment);
         return ResponseEntity.ok(createdTopic);
     }
+
+
 }

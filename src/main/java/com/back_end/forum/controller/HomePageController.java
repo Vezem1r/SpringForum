@@ -12,7 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/homepage")
@@ -35,10 +37,26 @@ public class HomePageController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/getTopic/{id}")
-    public ResponseEntity<Topic> getTopic(@PathVariable Long id) {
-        Topic topic = topicService.getTopicById(id);
-        return ResponseEntity.ok(topic);
+    @GetMapping("/getTopic/{topicId}")
+    public ResponseEntity<Topic> getTopicById(@PathVariable Long topicId) {
+        Optional<Topic> topic = topicService.getTopicById(topicId);
+        if (topic.isPresent()) {
+            return ResponseEntity.ok(topic.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Topic>> searchTopics(
+            @RequestParam Optional<Long> categoryId,
+            @RequestParam Optional<String> title,
+            @RequestParam Optional<LocalDateTime> startDate,
+            @RequestParam Optional<LocalDateTime> endDate,
+            @RequestParam Optional<String> sortBy,
+            @RequestParam Optional<List<String>> tagNames) {
+
+        List<Topic> topics = topicService.searchTopics(categoryId, title, startDate, endDate, sortBy, tagNames);
+        return ResponseEntity.ok(topics);
+    }
 }
