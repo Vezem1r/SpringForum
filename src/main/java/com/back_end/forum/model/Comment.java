@@ -2,7 +2,6 @@ package com.back_end.forum.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import com.back_end.forum.model.Topic;
 
 import java.time.LocalDateTime;
 import java.util.List;

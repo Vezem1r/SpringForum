@@ -1,10 +1,7 @@
 package com.back_end.forum.controller;
 
-import com.back_end.forum.dto.CategoryDto;
 import com.back_end.forum.dto.TagDto;
-import com.back_end.forum.model.Category;
 import com.back_end.forum.model.Tag;
-import com.back_end.forum.service.CategoryService;
 import com.back_end.forum.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

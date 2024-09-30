@@ -1,5 +1,6 @@
 package com.back_end.forum.controller;
 
+import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.Category;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.service.CategoryService;
@@ -7,8 +8,6 @@ import com.back_end.forum.service.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,14 +36,11 @@ public class HomePageController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/getTopic/{topicId}")
-    public ResponseEntity<Topic> getTopicById(@PathVariable Long topicId) {
-        Optional<Topic> topic = topicService.getTopicById(topicId);
-        if (topic.isPresent()) {
-            return ResponseEntity.ok(topic.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/getTopic/{id}")
+    public ResponseEntity<TopicWithAttachmentsDto> getTopicById(@PathVariable Long id) {
+        Optional<TopicWithAttachmentsDto> topicDto = topicService.getTopicById(id);
+        return topicDto.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search")

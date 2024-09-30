@@ -1,9 +1,12 @@
 package com.back_end.forum.service;
 
 import com.back_end.forum.dto.TopicDto;
+import com.back_end.forum.dto.TopicWithAttachmentsDto;
+import com.back_end.forum.model.Attachment;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.model.Tag;
+import com.back_end.forum.repository.AttachmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.back_end.forum.repository.CategoryRepository;
@@ -27,6 +30,7 @@ public class TopicService {
     private final CategoryRepository categoryRepository;
     private final TagService tagService;
     private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
 
     public Topic createTopic(TopicDto topicDTO, MultipartFile attachment) throws IOException {
         Topic topic = new Topic();
@@ -58,9 +62,27 @@ public class TopicService {
     public Page<Topic> getAllTopics(Pageable pageable) {
         return topicRepository.findAll(pageable);
     }
-    public Optional<Topic> getTopicById(Long topicId) {
-        return topicRepository.findById(topicId);
+    public Optional<TopicWithAttachmentsDto> getTopicById(Long topicId) {
+        Optional<Topic> optionalTopic = topicRepository.findById(topicId);
+
+        return optionalTopic.map(topic -> {
+            List<Attachment> attachments = attachmentRepository.findByTopic_TopicId(topic.getTopicId());
+            TopicWithAttachmentsDto topicDto = new TopicWithAttachmentsDto();
+
+            topicDto.setTopicId(topic.getTopicId());
+            topicDto.setTitle(topic.getTitle());
+            topicDto.setContent(topic.getContent());
+            topicDto.setCreatedAt(topic.getCreatedAt());
+            topicDto.setUpdatedAt(topic.getUpdatedAt());
+            topicDto.setUser(topic.getUser());
+            topicDto.setCategory(topic.getCategory());
+            topicDto.setTags(new ArrayList<>(topic.getTags()));
+            topicDto.setAttachments(attachments);
+
+            return topicDto;
+        });
     }
+
 
     public List<Topic> getTopicsByCategory(Long categoryId) {
         List<Topic> topics = topicRepository.findByCategory_CategoryId(categoryId);

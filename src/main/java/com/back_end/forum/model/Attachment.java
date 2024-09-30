@@ -3,8 +3,10 @@ package com.back_end.forum.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
-import com.back_end.forum.model.Comment;
 
 @Data
 @Entity
@@ -25,10 +27,15 @@ public class Attachment {
     private LocalDateTime createdAt;
 
     @OneToOne
-    @JoinColumn(name = "topic_id")
+    @JoinColumn(name = "topic_id", referencedColumnName = "topic_id")
     private Topic topic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
+
+    public byte[] getData() throws IOException {
+        Path path = Path.of(filePath);
+        return Files.readAllBytes(path);
+    }
 }
