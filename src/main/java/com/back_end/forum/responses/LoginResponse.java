@@ -8,4 +8,11 @@ import lombok.Data;
 public class LoginResponse {
     private String token;
     private long expiredIn;
+    private String message;
+
+    public LoginResponse(String token, String message) {
+        this.token = token;
+        this.expiredIn = 0;
+        this.message = message;
+    }
 }

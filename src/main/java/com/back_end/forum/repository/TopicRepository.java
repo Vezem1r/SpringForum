@@ -28,4 +28,6 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findByOrderByUpdatedAtDesc();
 
     int countByUser(User user);
+
+    List<Topic> findByUser_UserId(Long userId);
 }

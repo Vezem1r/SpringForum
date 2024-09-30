@@ -4,12 +4,15 @@ import com.back_end.forum.dto.Auth.LoginUserDto;
 import com.back_end.forum.dto.Auth.RegisterUserDto;
 import com.back_end.forum.dto.Auth.VerifyUserDto;
 import com.back_end.forum.model.User;
+import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.responses.LoginResponse;
 import com.back_end.forum.service.auth.AuthService;
 import com.back_end.forum.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RequestMapping("/auth")
 @RestController
@@ -18,6 +21,7 @@ public class AuthController {
 
     private final JwtService jwtService;
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<User> signup(@RequestBody RegisterUserDto registerUserDto){
@@ -29,8 +33,10 @@ public class AuthController {
     public ResponseEntity<LoginResponse> signin(@RequestBody LoginUserDto loginUserDto){
         System.out.println("Received login request: " + loginUserDto);
         User authenticatedUser = authService.authenticate(loginUserDto);
+        authenticatedUser.setLastLogin(LocalDateTime.now());
+        userRepository.save(authenticatedUser);
         String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime(), "Login successfull");
         return ResponseEntity.ok(loginResponse);
     }
 

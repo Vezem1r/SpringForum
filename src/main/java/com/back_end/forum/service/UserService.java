@@ -1,6 +1,8 @@
 package com.back_end.forum.service;
 
+import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.dto.UserProfileDto;
+import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
@@ -97,6 +99,20 @@ public class UserService {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
+    }
+
+    public boolean changeUsername(Long userId, String newUsername) {
+        if (userRepository.existsByUsername(newUsername)) {
+            return false;
+        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(newUsername);
+        userRepository.save(user);
+        return true;
+    }
+
+    public List<Topic> getUserTopics(Long userId) {
+        return topicRepository.findByUser_UserId(userId);
     }
 
 }
