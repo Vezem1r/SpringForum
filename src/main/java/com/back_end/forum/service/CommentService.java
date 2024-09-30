@@ -1,10 +1,7 @@
 package com.back_end.forum.service;
 
 import com.back_end.forum.dto.CommentDto;
-import com.back_end.forum.model.Attachment;
-import com.back_end.forum.model.Comment;
-import com.back_end.forum.model.Topic;
-import com.back_end.forum.model.User;
+import com.back_end.forum.model.*;
 import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
@@ -26,6 +23,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TopicRepository topicRepository;
     private final AttachmentService attachmentService;
+    private final NotificationService notificationService;
 
     public Comment createComment(CommentDto commentDto, MultipartFile[] attachments) throws IOException {
         Comment comment = new Comment();
@@ -44,6 +42,11 @@ public class CommentService {
             Comment parentComment = commentRepository.findById(commentDto.getParentId())
                     .orElseThrow(() -> new RuntimeException("Parent comment not found"));
             comment.setParentComment(parentComment);
+
+            notificationService.createNotification(
+                    parentComment.getUser().getUserId(),
+                    "You have a new reply to your comment in the topic: " + topic.getTitle()
+            );
         }
 
         Comment savedComment = commentRepository.save(comment);
@@ -55,6 +58,13 @@ public class CommentService {
             }
         }
         savedComment.setAttachments(savedAttachments);
+
+
+        Notification notification = notificationService.createNotification(
+                topic.getUser().getUserId(),
+                "You have a new comment on your topic: " + topic.getTitle()
+        );
+
         return savedComment;
     }
 }
