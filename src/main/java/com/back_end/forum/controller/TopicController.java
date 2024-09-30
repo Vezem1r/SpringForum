@@ -23,15 +23,6 @@ public class TopicController {
     private final TopicService topicService;
     private final UserRepository userRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Topic>> getTopicsByCategory(@RequestParam Long categoryId) {
-        List<Topic> topics = topicService.getTopicsByCategory(categoryId);
-        if (topics.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(topics);
-    }
-
     @PostMapping("/create")
     public ResponseEntity<Topic> createTopic(
             @RequestParam("title") String title,

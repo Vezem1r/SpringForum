@@ -55,4 +55,13 @@ public class HomePageController {
         List<Topic> topics = topicService.searchTopics(categoryId, title, startDate, endDate, sortBy, tagNames);
         return ResponseEntity.ok(topics);
     }
+
+    @GetMapping("/getByCategory/{categoryId}")
+    public ResponseEntity<List<Topic>> getTopicsByCategory(@PathVariable Long categoryId) {
+        List<Topic> topics = topicService.getTopicsByCategory(categoryId);
+        if (topics.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(topics);
+    }
 }

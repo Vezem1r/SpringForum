@@ -43,4 +43,11 @@ public class Comment {
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<Attachment> attachments;
+
+    @Column(nullable = false)
+    private Integer rating = 0;
+
+    public void updateRating(int value) {
+        this.rating += value;
+    }
 }

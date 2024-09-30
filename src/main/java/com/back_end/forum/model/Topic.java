@@ -48,4 +48,11 @@ public class Topic {
     )
     private Set<Tag> tags = new HashSet<>();
 
+    @Column(nullable = false)
+    private Integer rating = 0;
+
+    public void updateRating(int value) {
+        this.rating += value;
+    }
+
 }
