@@ -1,5 +1,6 @@
 package com.back_end.forum.controller;
 
+import com.back_end.forum.dto.UserProfileDto;
 import com.back_end.forum.model.User;
 import com.back_end.forum.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +21,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/profile")
-    public ResponseEntity<User> userProfile(){
+    public ResponseEntity<UserProfileDto> userProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(currentUser);
+        UserProfileDto profile = userService.getUserProfile(currentUser.getUserId());
+        return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> allUsers(){
-        List <User> users = userService.allUsers();
-        return ResponseEntity.ok(users);
-    }
 }

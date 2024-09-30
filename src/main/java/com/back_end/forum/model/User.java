@@ -44,6 +44,14 @@ public class User implements UserDetails {
 
     /*-----------------------------------------------------*/
 
+    @Column(name = "password_reset_code")
+    private String passwordResetCode;
+
+    @Column(name = "password_reset_expiration")
+    private LocalDateTime passwordResetCodeExpiredAt;
+
+    /*-----------------------------------------------------*/
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
