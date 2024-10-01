@@ -1,13 +1,17 @@
 package com.back_end.forum.controller;
 
+import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.dto.SearchRequest;
 import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.Category;
+import com.back_end.forum.model.Comment;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.service.CategoryService;
+import com.back_end.forum.service.CommentService;
 import com.back_end.forum.service.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +27,7 @@ public class HomePageController {
 
     private final TopicService topicService;
     private final CategoryService categoryService;
+    private final CommentService commentService;
 
 
     @GetMapping
@@ -57,5 +62,13 @@ public class HomePageController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(topics);
+    }
+
+    @GetMapping("/comments/{topicId}")
+    public ResponseEntity<Page<CommentDto>> getCommentsByTopicId(
+            @PathVariable Long topicId,
+            Pageable pageable) {
+        Page<CommentDto> comments = commentService.getCommentsByTopicId(topicId, pageable);
+        return ResponseEntity.ok(comments);
     }
 }

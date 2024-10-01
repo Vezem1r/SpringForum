@@ -81,7 +81,6 @@ public class TopicService {
             topicDto.setCategory(topic.getCategory());
             topicDto.setTags(new ArrayList<>(topic.getTags()));
             topicDto.setAttachments(attachments);
-
             return topicDto;
         });
     }

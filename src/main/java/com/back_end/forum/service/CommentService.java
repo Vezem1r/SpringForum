@@ -7,6 +7,9 @@ import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,4 +71,30 @@ public class CommentService {
 
         return savedComment;
     }
+
+    public Page<CommentDto> getCommentsByTopicId(Long topicId, Pageable pageable) {
+        Page<Comment> comments = commentRepository.findByTopic_TopicId(topicId, pageable);
+        return comments.map(this::convertToDto);
+    }
+    private CommentDto convertToDto(Comment comment) {
+        CommentDto dto = new CommentDto();
+        dto.setContent(comment.getContent());
+        dto.setUsername(comment.getUser().getUsername());
+
+        // Проверка на null для родительского комментария
+        if (comment.getParentComment() != null) {
+            dto.setParentId(comment.getParentComment().getCommentId());
+        } else {
+            dto.setParentId(null); // или можно не устанавливать это поле
+        }
+
+        dto.setCreatedAt(comment.getCreatedAt());
+        dto.setTopicId(comment.getTopic().getTopicId());
+        dto.setAttachmentIds(comment.getAttachments().stream()
+                .map(Attachment::getId)
+                .collect(Collectors.toList()));
+
+        return dto;
+    }
+
 }

@@ -1,9 +1,6 @@
 package com.back_end.forum.dto;
 
-import com.back_end.forum.model.Attachment;
-import com.back_end.forum.model.User;
-import com.back_end.forum.model.Category;
-import com.back_end.forum.model.Tag;
+import com.back_end.forum.model.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,6 @@
 package com.back_end.forum.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,44 +37,54 @@ public class User implements UserDetails {
 
     /*-----------------------------------------------------*/
 
+    @JsonIgnore
     @Column(name = "verification_code")
     private String verificationCode;
 
+    @JsonIgnore
     @Column(name = "verification_expiration")
     private LocalDateTime verificationCodeExpiredAt;
 
+    @JsonIgnore
     private boolean enabled;
 
     /*-----------------------------------------------------*/
 
+    @JsonIgnore
     @Column(name = "password_reset_code")
     private String passwordResetCode;
 
+    @JsonIgnore
     @Column(name = "password_reset_expiration")
     private LocalDateTime passwordResetCodeExpiredAt;
 
     /*-----------------------------------------------------*/
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return enabled;
