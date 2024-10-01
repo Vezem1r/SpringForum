@@ -69,18 +69,23 @@ public class AuthController {
     }
 
     @PostMapping("/password-reset/request")
-    public ResponseEntity<String> requestPasswordReset(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        userService.initiatePasswordReset(currentUser.getUserId());
-        return ResponseEntity.ok("Password reset code has been sent to your email.");
+    public ResponseEntity<String> requestPasswordReset(@RequestParam("email") String email){
+        try {
+            userService.initiatePasswordResetByEmail(email);
+            return ResponseEntity.ok("Password reset code has been sent to your email.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
+
     @PostMapping("/password-reset/confirm")
-    public ResponseEntity<String> confirmPasswordReset(@RequestBody ChangePasswordDto changePasswordDto){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        userService.resetPassword(currentUser.getUserId(), changePasswordDto.getResetCode(), changePasswordDto.getNewPassword());
+    public ResponseEntity<String> confirmPasswordReset(@RequestBody ChangePasswordDto changePasswordDto) {
+        User user = userRepository.findByPasswordResetCode(changePasswordDto.getResetCode())
+                .orElseThrow(() -> new RuntimeException("Invalid reset code or user not found"));
+
+        userService.resetPassword(user.getUserId(), changePasswordDto.getResetCode(), changePasswordDto.getNewPassword());
+
         return ResponseEntity.ok("Password has been successfully reset.");
     }
 }

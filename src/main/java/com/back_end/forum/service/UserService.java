@@ -58,9 +58,9 @@ public class UserService {
         return profileDto;
     }
 
-    public void initiatePasswordReset(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void initiatePasswordResetByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User with this email not found"));
 
         String resetCode = generateResetCode();
         user.setPasswordResetCode(resetCode);
@@ -97,8 +97,14 @@ public class UserService {
 
     private String generateResetCode() {
         Random random = new Random();
-        int code = random.nextInt(900000) + 100000;
-        return String.valueOf(code);
+        String resetCode;
+
+        do {
+            int code = random.nextInt(900000) + 100000;
+            resetCode = String.valueOf(code);
+        } while (userRepository.existsByPasswordResetCode(resetCode));
+
+        return resetCode;
     }
 
     public boolean changeUsername(Long userId, String newUsername) {
