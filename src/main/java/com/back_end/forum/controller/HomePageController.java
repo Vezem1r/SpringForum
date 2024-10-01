@@ -1,5 +1,6 @@
 package com.back_end.forum.controller;
 
+import com.back_end.forum.dto.SearchRequest;
 import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.Category;
 import com.back_end.forum.model.Topic;
@@ -43,21 +44,14 @@ public class HomePageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Topic>> searchTopics(
-            @RequestParam Optional<Long> categoryId,
-            @RequestParam Optional<String> title,
-            @RequestParam Optional<LocalDateTime> startDate,
-            @RequestParam Optional<LocalDateTime> endDate,
-            @RequestParam Optional<String> sortBy,
-            @RequestParam Optional<List<String>> tagNames) {
-
-        List<Topic> topics = topicService.searchTopics(categoryId, title, startDate, endDate, sortBy, tagNames);
+    @PostMapping("/search")
+    public ResponseEntity<List<Topic>> searchTopics(@RequestBody SearchRequest searchRequest) {
+        List<Topic> topics = topicService.searchTopics(searchRequest);
         return ResponseEntity.ok(topics);
     }
 
     @GetMapping("/getByCategory/{categoryId}")
-    public ResponseEntity<List<Topic>> getTopicsByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<List<Topic>> getTopicsByCategory(@RequestParam Long categoryId) {
         List<Topic> topics = topicService.getTopicsByCategory(categoryId);
         if (topics.isEmpty()) {
             return ResponseEntity.noContent().build();

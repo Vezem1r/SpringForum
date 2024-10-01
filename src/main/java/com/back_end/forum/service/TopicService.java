@@ -1,5 +1,6 @@
 package com.back_end.forum.service;
 
+import com.back_end.forum.dto.SearchRequest;
 import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.Attachment;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -90,40 +92,53 @@ public class TopicService {
         return topics;
     }
 
-    public List<Topic> searchTopics(Optional<Long> categoryId, Optional<String> title,
-                                    Optional<LocalDateTime> startDate, Optional<LocalDateTime> endDate,
-                                    Optional<String> sortBy, Optional<List<String>> tagNames) {
-
-        if (categoryId.isPresent()) {
-            return topicRepository.findByCategory_CategoryId(categoryId.get());
+    public List<Topic> searchTopics(SearchRequest searchRequest) {
+        List<Topic> topics = topicRepository.findAll();
+        if (searchRequest.getTitle() != null) {
+            topics.removeIf(topic -> !topic.getTitle().toLowerCase().contains(searchRequest.getTitle().toLowerCase()));
         }
 
-        if (title.isPresent()) {
-            return topicRepository.findByTitleContainingIgnoreCase(title.get());
+        if (searchRequest.getTags() != null && !searchRequest.getTags().isEmpty()) {
+            topics.removeIf(topic ->
+                    !topic.getTags().stream()
+                            .map(Tag::getName)
+                            .collect(Collectors.toSet())
+                            .containsAll(searchRequest.getTags())
+            );
         }
 
-        if (startDate.isPresent() && endDate.isPresent()) {
-            return topicRepository.findByCreatedAtBetween(startDate.get(), endDate.get());
+        if (searchRequest.getCategoryId() != null) {
+            topics.removeIf(topic -> !topic.getCategory().getCategoryId().equals(searchRequest.getCategoryId()));
         }
 
-        if (tagNames.isPresent()) {
-            List<Long> tagIds = tagService.getTagIdsByName(tagNames.get());
-            return topicRepository.findByTags(tagIds, (long) tagIds.size());
+        if (searchRequest.getMinRating() != null) {
+            topics.removeIf(topic -> topic.getRating() < searchRequest.getMinRating());
         }
 
-        if (sortBy.isPresent()) {
-            switch (sortBy.get()) {
-                case "createdAsc":
-                    return topicRepository.findByOrderByCreatedAtAsc();
-                case "createdDesc":
-                    return topicRepository.findByOrderByCreatedAtDesc();
-                case "updatedAsc":
-                    return topicRepository.findByOrderByUpdatedAtAsc();
-                case "updatedDesc":
-                    return topicRepository.findByOrderByUpdatedAtDesc();
-            }
+        if (searchRequest.getMaxRating() != null) {
+            topics.removeIf(topic -> topic.getRating() > searchRequest.getMaxRating());
         }
 
-        return Collections.emptyList();
+        if (searchRequest.getUpdatedAfter() != null) {
+            topics.removeIf(topic -> topic.getUpdatedAt().isBefore(searchRequest.getUpdatedAfter()));
+        }
+
+        if (searchRequest.getUpdatedBefore() != null) {
+            topics.removeIf(topic -> topic.getUpdatedAt().isAfter(searchRequest.getUpdatedBefore()));
+        }
+
+        if ("rating".equals(searchRequest.getSortBy())) {
+            topics.sort(Comparator.comparingInt(Topic::getRating));
+        } else if ("createdAt".equals(searchRequest.getSortBy())) {
+            topics.sort(Comparator.comparing(Topic::getCreatedAt));
+        } else if ("updatedAt".equals(searchRequest.getSortBy())) {
+            topics.sort(Comparator.comparing(Topic::getUpdatedAt));
+        }
+
+        if ("desc".equalsIgnoreCase(searchRequest.getSortOrder())) {
+            Collections.reverse(topics);
+        }
+
+        return topics;
     }
 }

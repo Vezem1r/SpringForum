@@ -114,5 +114,4 @@ public class UserService {
     public List<Topic> getUserTopics(Long userId) {
         return topicRepository.findByUser_UserId(userId);
     }
-
 }

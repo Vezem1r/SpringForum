@@ -32,6 +32,8 @@ public class User implements UserDetails {
     @Column
     private LocalDateTime lastLogin;
 
+    private String profilePicture;
+
     /*-----------------------------------------------------*/
 
     @Column(name = "verification_code")
