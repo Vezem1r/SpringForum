@@ -33,21 +33,7 @@ public class UserController {
         UserProfileDto profile = userService.getUserProfile(currentUser.getUserId());
         return ResponseEntity.ok(profile);
     }
-    @PostMapping("/password-reset/request")
-    public ResponseEntity<String> requestPasswordReset(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        userService.initiatePasswordReset(currentUser.getUserId());
-        return ResponseEntity.ok("Password reset code has been sent to your email.");
-    }
 
-    @PostMapping("/password-reset/confirm")
-    public ResponseEntity<String> confirmPasswordReset(@RequestBody ChangePasswordDto changePasswordDto){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        userService.resetPassword(currentUser.getUserId(), changePasswordDto.getResetCode(), changePasswordDto.getNewPassword());
-        return ResponseEntity.ok("Password has been successfully reset.");
-    }
     @PostMapping("/change-username")
     public ResponseEntity<LoginResponse> changeUsername(@RequestBody ChangeUsernameDto changeUsernameDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

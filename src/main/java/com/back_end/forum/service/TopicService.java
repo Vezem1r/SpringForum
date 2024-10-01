@@ -77,6 +77,7 @@ public class TopicService {
             topicDto.setCreatedAt(topic.getCreatedAt());
             topicDto.setUpdatedAt(topic.getUpdatedAt());
             topicDto.setUser(topic.getUser());
+            topicDto.setRating(topic.getRating());
             topicDto.setCategory(topic.getCategory());
             topicDto.setTags(new ArrayList<>(topic.getTags()));
             topicDto.setAttachments(attachments);

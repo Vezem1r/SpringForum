@@ -17,6 +17,7 @@ public class TopicWithAttachmentsDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private User user;
+    private Integer rating;
     private Category category;
     private List<Tag> tags;
     private List<Attachment> attachments;
