@@ -1,6 +1,6 @@
 package com.back_end.forum.service;
 
-import com.back_end.forum.dto.SearchRequest;
+import com.back_end.forum.Specifications.TopicSpecifications;
 import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.*;
@@ -10,8 +10,11 @@ import com.back_end.forum.responses.CommentResponse;
 import com.back_end.forum.responses.TopicPageResponse;
 import com.back_end.forum.responses.TopicResponseDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,55 +94,36 @@ public class TopicService {
         ));
     }
 
+    public Page<TopicResponseDto> searchTopics(String title, String category, List<String> tags,
+                                               Integer minRating, Integer maxRating,
+                                               String sortField, String sortDirection,
+                                               Pageable pageable) {
+        Specification<Topic> spec = Specification.where(TopicSpecifications.withTitle(title))
+                .and(TopicSpecifications.withCategory(category))
+                .and(TopicSpecifications.withTags(tags))
+                .and(TopicSpecifications.withRatingBetween(minRating, maxRating));
 
-    public List<Topic> searchTopics(SearchRequest searchRequest) {
-        List<Topic> topics = topicRepository.findAll();
-        if (searchRequest.getTitle() != null) {
-            topics.removeIf(topic -> !topic.getTitle().toLowerCase().contains(searchRequest.getTitle().toLowerCase()));
-        }
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
 
-        if (searchRequest.getTags() != null && !searchRequest.getTags().isEmpty()) {
-            topics.removeIf(topic ->
-                    !topic.getTags().stream()
-                            .map(Tag::getName)
-                            .collect(Collectors.toSet())
-                            .containsAll(searchRequest.getTags())
-            );
-        }
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        if (searchRequest.getCategoryId() != null) {
-            topics.removeIf(topic -> !topic.getCategory().getCategoryId().equals(searchRequest.getCategoryId()));
-        }
+        Page<Topic> topicPage = topicRepository.findAll(spec, sortedPageable);
 
-        if (searchRequest.getMinRating() != null) {
-            topics.removeIf(topic -> topic.getRating() < searchRequest.getMinRating());
-        }
+        return topicPage.map(this::convertToDto);
+    }
 
-        if (searchRequest.getMaxRating() != null) {
-            topics.removeIf(topic -> topic.getRating() > searchRequest.getMaxRating());
-        }
 
-        if (searchRequest.getUpdatedAfter() != null) {
-            topics.removeIf(topic -> topic.getUpdatedAt().isBefore(searchRequest.getUpdatedAfter()));
-        }
-
-        if (searchRequest.getUpdatedBefore() != null) {
-            topics.removeIf(topic -> topic.getUpdatedAt().isAfter(searchRequest.getUpdatedBefore()));
-        }
-
-        if ("rating".equals(searchRequest.getSortBy())) {
-            topics.sort(Comparator.comparingInt(Topic::getRating));
-        } else if ("createdAt".equals(searchRequest.getSortBy())) {
-            topics.sort(Comparator.comparing(Topic::getCreatedAt));
-        } else if ("updatedAt".equals(searchRequest.getSortBy())) {
-            topics.sort(Comparator.comparing(Topic::getUpdatedAt));
-        }
-
-        if ("desc".equalsIgnoreCase(searchRequest.getSortOrder())) {
-            Collections.reverse(topics);
-        }
-
-        return topics;
+    public TopicResponseDto convertToDto(Topic topic){
+        return new TopicResponseDto(
+                topic.getId(),
+                topic.getTitle(),
+                topic.getCreatedAt(),
+                topic.getUpdatedAt(),
+                topic.getUser().getUsername(),
+                topic.getCategory().getName(),
+                topic.getTags().stream().map(Tag::getName).collect(Collectors.toList()),
+                topic.getRating()
+        );
     }
 
     public TopicPageResponse getTopicPageById(Long topicId, Pageable pageable) {
