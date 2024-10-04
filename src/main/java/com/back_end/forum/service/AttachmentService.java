@@ -28,41 +28,24 @@ public class AttachmentService {
     private final TopicRepository topicRepository;
     private final CommentRepository commentRepository;
 
-    private final String uploadDir = "src/main/resources/static/uploads";
+    private final String UPLOAD_DIR = "src/main/resources/static/uploads";
 
-    public Attachment saveAttachment(MultipartFile file, Long topicId, Long commentId) throws IOException {
-        String originalFilename = file.getOriginalFilename();
+    public Attachment saveAttachment(MultipartFile attachmentFile) throws IOException {
+        String originalFilename = attachmentFile.getOriginalFilename();
         String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-        Path uploadPath = Paths.get(uploadDir, uniqueFilename);
-
-        if(topicId != null){
-            byte[] resizedImage = ImageUtils.resizeAndCompressImage(file);
-            Files.write(uploadPath,resizedImage);
-        }
-            else{
-                Files.write(uploadPath, file.getBytes());
-
-        }
+        Path uploadPath = Paths.get(UPLOAD_DIR, uniqueFilename);
+        Files.write(uploadPath, attachmentFile.getBytes());
         Attachment attachment = new Attachment();
         attachment.setFilename(originalFilename);
-        attachment.setContentType(file.getContentType());
-        attachment.setSize(file.getSize());
+        attachment.setSize(attachmentFile.getSize());
+        attachment.setContentType(attachmentFile.getContentType());
         attachment.setFilePath(uploadPath.toString());
         attachment.setCreatedAt(LocalDateTime.now());
-
-        System.out.println("Starts saving");
-        if (topicId != null) {
-            Topic topic = topicRepository.findById(topicId)
-                    .orElseThrow(() -> new RuntimeException("Topic not found"));
-            System.out.println("Setting topic to attachment" + topic);
-            attachment.setTopic(topic);
-        } else if (commentId != null) {
-            Comment comment = commentRepository.findById(commentId)
-                    .orElseThrow(() -> new RuntimeException("Comment not found"));
-            attachment.setComment(comment);
-        }
-
         return attachmentRepository.save(attachment);
+    }
+
+    private String getFileExtension(String filename) {
+        return filename.substring(filename.lastIndexOf('.') + 1);
     }
 
     public Attachment getAttachment(Long id) {

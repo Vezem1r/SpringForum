@@ -43,7 +43,7 @@ public class AuthController {
         authenticatedUser.setLastLogin(LocalDateTime.now());
         userRepository.save(authenticatedUser);
         String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime(), "Login successfull");
+        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime(), "Login successful");
         return ResponseEntity.ok(loginResponse);
     }
 

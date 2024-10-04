@@ -1,9 +1,11 @@
 package com.back_end.forum.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,11 +29,11 @@ public class Comment {
     private LocalDateTime deletedAt;
 
     @ManyToOne
-    @JoinColumn(name = "user_user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "topic_topic_id", nullable = false)
+    @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
     @ManyToOne
@@ -41,11 +43,17 @@ public class Comment {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
     private Set<Comment> replies;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private List<Attachment> attachments;
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Attachment> attachments = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer rating = 0;
+
+    public void addAttachment(Attachment attachment) {
+        attachments.add(attachment);
+        attachment.setComment(this);
+    }
 
     public void updateRating(int value) {
         this.rating += value;

@@ -1,7 +1,9 @@
 package com.back_end.forum.controller;
 
 import com.back_end.forum.dto.CommentDto;
+import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.model.Comment;
+import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -20,27 +22,16 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/add")
-    public ResponseEntity<Comment> createComment(
-            @RequestParam("content") String content,
-            @RequestParam("topicId") Long topicId,
-            @RequestParam(value = "parentId", required = false) Long parentId,
-            @RequestParam(value = "attachments", required = false) MultipartFile[] attachments) throws IOException {
+    public ResponseEntity<Comment> createTopic(@ModelAttribute CommentDto commentDto) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        Long userId = currentUser.getUserId();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
-        System.out.println("Received topicId: " + topicId);
-        System.out.println("Received User: " + userId);
-        CommentDto commentDto = new CommentDto();
-        commentDto.setContent(content);
-        commentDto.setUserId(userId);
-        commentDto.setTopicId(topicId);
-        commentDto.setParentId(parentId);
-
-        System.out.println(commentDto);
-
-        Comment createdComment = commentService.createComment(commentDto, attachments);
-        return ResponseEntity.ok(createdComment);
+        try {
+            Comment createdComment = commentService.addComment(commentDto, username);
+            return ResponseEntity.ok(createdComment);
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

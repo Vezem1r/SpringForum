@@ -25,6 +25,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(length = 127, nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)

@@ -1,5 +1,7 @@
 package com.back_end.forum.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,13 +28,15 @@ public class Attachment {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToOne
-    @JoinColumn(name = "topic_id", referencedColumnName = "topic_id")
-    private Topic topic;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "comment_id")
+    @JsonBackReference
     private Comment comment;
+
+    @ManyToOne
+    @JoinColumn(name = "topic_id")
+    @JsonBackReference
+    private Topic topic;
 
     public byte[] getData() throws IOException {
         Path path = Path.of(filePath);

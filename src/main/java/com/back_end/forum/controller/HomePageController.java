@@ -1,7 +1,9 @@
 package com.back_end.forum.controller;
 
 import com.back_end.forum.dto.CommentDto;
+import com.back_end.forum.responses.TopicResponseDto;
 import com.back_end.forum.dto.SearchRequest;
+import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.Category;
 import com.back_end.forum.model.Comment;
@@ -30,10 +32,9 @@ public class HomePageController {
     private final CommentService commentService;
 
 
-    @GetMapping
-    public ResponseEntity<Page<Topic>> getAllTopics(Pageable pageable) {
-        Page<Topic> topics = topicService.getAllTopics(pageable);
-        return ResponseEntity.ok(topics);
+    @GetMapping("/getAllTopics")
+    public Page<TopicResponseDto> getAllTopics(Pageable pageable) {
+        return topicService.getAllTopics(pageable);
     }
 
     @GetMapping("/getAllCategories")
@@ -42,33 +43,9 @@ public class HomePageController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/getTopic/{id}")
-    public ResponseEntity<TopicWithAttachmentsDto> getTopicById(@PathVariable Long id) {
-        Optional<TopicWithAttachmentsDto> topicDto = topicService.getTopicById(id);
-        return topicDto.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @PostMapping("/search")
     public ResponseEntity<List<Topic>> searchTopics(@RequestBody SearchRequest searchRequest) {
         List<Topic> topics = topicService.searchTopics(searchRequest);
         return ResponseEntity.ok(topics);
-    }
-
-    @GetMapping("/getByCategory/{categoryId}")
-    public ResponseEntity<List<Topic>> getTopicsByCategory(@RequestParam Long categoryId) {
-        List<Topic> topics = topicService.getTopicsByCategory(categoryId);
-        if (topics.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(topics);
-    }
-
-    @GetMapping("/comments/{topicId}")
-    public ResponseEntity<Page<CommentDto>> getCommentsByTopicId(
-            @PathVariable Long topicId,
-            Pageable pageable) {
-        Page<CommentDto> comments = commentService.getCommentsByTopicId(topicId, pageable);
-        return ResponseEntity.ok(comments);
     }
 }
