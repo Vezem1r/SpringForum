@@ -22,8 +22,6 @@ import java.util.List;
 public class TopicController {
 
     private final TopicService topicService;
-    private final UserRepository userRepository;
-    private final AttachmentService attachmentService;
 
     @PostMapping("/create")
     public ResponseEntity<Topic> createTopic(@ModelAttribute TopicDto topicDto) {

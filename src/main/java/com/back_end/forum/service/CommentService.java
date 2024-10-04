@@ -6,6 +6,7 @@ import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
+import com.back_end.forum.responses.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,4 +62,45 @@ public class CommentService {
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
     }
 
+    public Page<CommentResponse> getCommentReplies(Long parentId, Pageable pageable) {
+        Page<Comment> parentComments = commentRepository.findByParentComment_CommentId(parentId, pageable);
+        return parentComments.map(comment -> {
+            CommentResponse dto = new CommentResponse(
+                    comment.getCommentId(),
+                    comment.getContent(),
+                    comment.getCreatedAt(),
+                    comment.getUser().getUsername(),
+                    parentId,
+                    commentRepository.countByParentComment_CommentId(comment.getCommentId()),
+                    new ArrayList<>()
+            );
+
+            List<CommentResponse> childReplies = loadChildReplies(comment.getCommentId());
+            dto.setReplies(childReplies);
+
+            return dto;
+        });
+    }
+
+    private List<CommentResponse> loadChildReplies(Long parentId) {
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        List<Comment> replies = commentRepository.findByParentComment_CommentId(parentId, pageable).getContent();
+
+        return replies.stream().map(reply -> {
+            CommentResponse replyDto = new CommentResponse(
+                    reply.getCommentId(),
+                    reply.getContent(),
+                    reply.getCreatedAt(),
+                    reply.getUser().getUsername(),
+                    parentId,
+                    commentRepository.countByParentComment_CommentId(reply.getCommentId()),
+                    new ArrayList<>()
+            );
+
+            List<CommentResponse> childReplies = loadChildReplies(reply.getCommentId());
+            replyDto.setReplies(childReplies);
+
+            return replyDto;
+        }).collect(Collectors.toList());
+    }
 }

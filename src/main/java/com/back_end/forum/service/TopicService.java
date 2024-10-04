@@ -6,6 +6,7 @@ import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.*;
 import com.back_end.forum.repository.*;
 import com.back_end.forum.responses.AttachmentResponse;
+import com.back_end.forum.responses.CommentResponse;
 import com.back_end.forum.responses.TopicPageResponse;
 import com.back_end.forum.responses.TopicResponseDto;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ public class TopicService {
     private final AttachmentService attachmentService;
     private final AttachmentRepository attachmentRepository;
     private final BannerService bannerService;
+    private final CommentRepository commentRepository;
 
     public Topic createTopic(TopicDto topicDTO, String username) throws IOException {
             Topic topic = new Topic();
@@ -140,7 +142,7 @@ public class TopicService {
         return topics;
     }
 
-    public TopicPageResponse getTopicPageById(Long topicId) {
+    public TopicPageResponse getTopicPageById(Long topicId, Pageable pageable) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new RuntimeException("Topic not found"));
 
@@ -154,6 +156,20 @@ public class TopicService {
                         "/topicpage/attachments/download/" + attachment.getId()))
                 .collect(Collectors.toList());
 
+
+        Page<Comment> commentPage = commentRepository.findByTopic_IdAndParentCommentIsNull(topicId, pageable);
+        List<CommentResponse> commentResponses = commentPage.getContent().stream()
+                .map(comment -> new CommentResponse(
+                        comment.getCommentId(),
+                        comment.getContent(),
+                        comment.getCreatedAt(),
+                        comment.getUser().getUsername(),
+                        null,
+                        commentRepository.countByParentComment_CommentId(comment.getCommentId()),
+                        new ArrayList<>()
+                ))
+                .collect(Collectors.toList());
+
         return new TopicPageResponse(
                 topic.getId(),
                 topic.getTitle(),
@@ -164,8 +180,8 @@ public class TopicService {
                 topic.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toList()),
                 topic.getRating(),
                 bannerUrl,
-                attachmentResponses
-
+                attachmentResponses,
+                commentResponses
         );
     }
 }

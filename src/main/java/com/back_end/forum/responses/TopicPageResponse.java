@@ -19,4 +19,5 @@ public class TopicPageResponse {
     private Integer rating;
     private String bannerUrl;
     private List<AttachmentResponse> attachments;
+    private List<CommentResponse> comments;
 }
