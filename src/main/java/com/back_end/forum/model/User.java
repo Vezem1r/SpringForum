@@ -34,6 +34,7 @@ public class User implements UserDetails {
     @Column
     private LocalDateTime lastLogin;
 
+    @Column
     private String profilePicture;
 
     /*-----------------------------------------------------*/

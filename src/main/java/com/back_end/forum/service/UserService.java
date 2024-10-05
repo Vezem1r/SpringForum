@@ -9,11 +9,18 @@ import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.service.auth.EmailService;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +40,8 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final String UPLOAD_DIR = "src/main/resources/static/avatars";
+
     public List<User> allUsers(){
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(users::add);
@@ -49,6 +58,7 @@ public class UserService {
         profileDto.setEmail(user.getEmail());
         profileDto.setCreatedAt(user.getCreatedAt());
         profileDto.setLastLogin(user.getLastLogin());
+        profileDto.setProfilePicture(user.getProfilePicture());
 
         int commentCount = commentRepository.countByUser(user);
         int topicCount = topicRepository.countByUser(user);
@@ -57,6 +67,25 @@ public class UserService {
 
         return profileDto;
     }
+
+    public String uploadAvatar(Long userId, MultipartFile file) throws IOException{
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(user.getProfilePicture() != null){
+            Path oldAvatarPath = Paths.get(UPLOAD_DIR).resolve(user.getProfilePicture());
+            Files.deleteIfExists(oldAvatarPath);
+        }
+
+        String avatarFileName = "avatar_" + userId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        Path avatarPath = Paths.get(UPLOAD_DIR).resolve(avatarFileName);
+        Files.copy(file.getInputStream(), avatarPath);
+
+        user.setProfilePicture(avatarFileName);
+        userRepository.save(user);
+
+        return avatarFileName;
+    }
+
 
     public void initiatePasswordResetByEmail(String email) {
         User user = userRepository.findByEmail(email)

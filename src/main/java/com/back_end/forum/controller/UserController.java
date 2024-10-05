@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequestMapping("/users")
@@ -32,6 +34,19 @@ public class UserController {
         User currentUser = (User) authentication.getPrincipal();
         UserProfileDto profile = userService.getUserProfile(currentUser.getUserId());
         return ResponseEntity.ok(profile);
+    }
+
+    @PostMapping("/upload-avatar")
+    public ResponseEntity<String> uploadAvatar(@RequestParam("avatar") MultipartFile avatar) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+
+        try {
+            String avatarFileName = userService.uploadAvatar(currentUser.getUserId(), avatar);
+            return ResponseEntity.ok("Avatar uploaded successfully: " + avatarFileName);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to upload avatar.");
+        }
     }
 
     @PostMapping("/change-username")

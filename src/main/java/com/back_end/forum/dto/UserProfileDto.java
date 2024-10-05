@@ -13,4 +13,5 @@ public class UserProfileDto {
     private LocalDateTime lastLogin;
     private int commentCount;
     private int topicCount;
+    private String profilePicture;
 }
