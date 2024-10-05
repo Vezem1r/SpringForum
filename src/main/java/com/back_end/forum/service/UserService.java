@@ -1,22 +1,17 @@
 package com.back_end.forum.service;
 
-import com.back_end.forum.dto.TopicDto;
 import com.back_end.forum.dto.UserProfileDto;
-import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.service.auth.EmailService;
 import jakarta.mail.MessagingException;
-import jakarta.mail.Multipart;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

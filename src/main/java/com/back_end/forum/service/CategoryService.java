@@ -16,7 +16,6 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final TopicRepository topicRepository;
 
     public Category createCategory(CategoryDto categoryDto){
         Optional<Category> optionalCategory = categoryRepository.findByName(categoryDto.getName());

@@ -2,7 +2,6 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.model.*;
-import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;

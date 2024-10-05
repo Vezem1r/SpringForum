@@ -1,12 +1,7 @@
 package com.back_end.forum.service;
 
 import com.back_end.forum.model.Attachment;
-import com.back_end.forum.model.Comment;
-import com.back_end.forum.model.Topic;
 import com.back_end.forum.repository.AttachmentRepository;
-import com.back_end.forum.repository.CommentRepository;
-import com.back_end.forum.repository.TopicRepository;
-import com.back_end.forum.utils.ImageUtils;
 import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -25,8 +20,6 @@ import java.util.UUID;
 public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
-    private final TopicRepository topicRepository;
-    private final CommentRepository commentRepository;
 
     private final String UPLOAD_DIR = "src/main/resources/static/uploads";
 

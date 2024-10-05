@@ -1,10 +1,6 @@
 package com.back_end.forum.controller;
 
-import com.back_end.forum.dto.ChangePasswordDto;
 import com.back_end.forum.dto.ChangeUsernameDto;
-import com.back_end.forum.dto.TopicDto;
-import com.back_end.forum.dto.UserProfileDto;
-import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.responses.LoginResponse;
 import com.back_end.forum.service.UserService;

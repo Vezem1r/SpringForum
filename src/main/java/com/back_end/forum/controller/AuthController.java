@@ -12,12 +12,9 @@ import com.back_end.forum.service.auth.AuthService;
 import com.back_end.forum.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Map;
 
 @RequestMapping("/auth")
@@ -53,7 +50,7 @@ public class AuthController {
             authService.verifyUser(verifyUserDto);
             return ResponseEntity.ok(Map.of("message", "Account verified successfully")); // Return as JSON
         } catch (RuntimeException err) {
-            return ResponseEntity.badRequest().body(Map.of("error", err.getMessage())); // Return as JSON
+            return ResponseEntity.badRequest().body(Map.of("error", err.getMessage()));
         }
     }
 

@@ -2,7 +2,6 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.Specifications.TopicSpecifications;
 import com.back_end.forum.dto.TopicDto;
-import com.back_end.forum.dto.TopicWithAttachmentsDto;
 import com.back_end.forum.model.*;
 import com.back_end.forum.repository.*;
 import com.back_end.forum.responses.AttachmentResponse;
@@ -18,10 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 

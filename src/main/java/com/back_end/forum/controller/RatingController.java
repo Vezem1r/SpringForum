@@ -2,7 +2,7 @@ package com.back_end.forum.controller;
 
 import com.back_end.forum.model.User;
 import com.back_end.forum.service.RatingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/ratings")
+@AllArgsConstructor
 public class RatingController {
 
-    @Autowired
     private RatingService ratingService;
 
     @PostMapping("/topic/{topicId}")

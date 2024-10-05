@@ -2,7 +2,6 @@ package com.back_end.forum.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
