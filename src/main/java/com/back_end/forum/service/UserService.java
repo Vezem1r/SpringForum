@@ -48,14 +48,13 @@ public class UserService {
         return users;
     }
 
-    public UserProfileDto getUserProfile(Long userId){
-        User user = userRepository.findById(userId)
+    public UserProfileDto getProfileByUsername(String username){
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserProfileDto profileDto = new UserProfileDto();
         profileDto.setUserId(user.getUserId());
         profileDto.setUsername(user.getUsername());
-        profileDto.setEmail(user.getEmail());
         profileDto.setCreatedAt(user.getCreatedAt());
         profileDto.setLastLogin(user.getLastLogin());
         profileDto.setProfilePicture(user.getProfilePicture());
@@ -144,9 +143,5 @@ public class UserService {
         user.setUsername(newUsername);
         userRepository.save(user);
         return true;
-    }
-
-    public List<Topic> getUserTopics(Long userId) {
-        return topicRepository.findByUser_UserId(userId);
     }
 }

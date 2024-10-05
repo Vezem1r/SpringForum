@@ -5,6 +5,7 @@ import com.back_end.forum.model.Category;
 import com.back_end.forum.service.CategoryService;
 import com.back_end.forum.service.CommentService;
 import com.back_end.forum.service.TopicService;
+import com.back_end.forum.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,4 +56,6 @@ public class HomePageController {
 
         return topicService.searchTopics(title, category, tagList, minRating, maxRating, sortField, sortDirection, pageable);
     }
+
+
 }

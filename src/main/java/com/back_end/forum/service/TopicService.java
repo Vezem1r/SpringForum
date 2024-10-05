@@ -168,4 +168,19 @@ public class TopicService {
                 commentResponses
         );
     }
+
+    public List<TopicResponseDto> getUserTopicsByUsername(String username){
+        List<Topic> topics = topicRepository.findAllByUser_Username(username);
+
+        return topics.stream().map(topic -> new TopicResponseDto(
+                topic.getId(),
+                topic.getTitle(),
+                topic.getCreatedAt(),
+                topic.getUpdatedAt(),
+                topic.getUser().getUsername(),
+                topic.getCategory().getName(),
+                topic.getTags().stream().map(Tag::getName).collect(Collectors.toList()),
+                topic.getRating()
+        )).collect(Collectors.toList());
+    }
 }

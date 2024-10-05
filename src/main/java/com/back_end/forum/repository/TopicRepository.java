@@ -15,9 +15,8 @@ import java.util.List;
 
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long>, JpaSpecificationExecutor {
-    List<Topic> findByCategory_CategoryId(Long categoryId);
-
     int countByUser(User user);
 
-    List<Topic> findByUser_UserId(Long userId);
+    List<Topic> findAllByUser_Username(String username);
+
 }

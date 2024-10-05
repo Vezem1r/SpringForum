@@ -28,13 +28,6 @@ public class UserController {
 
     private final JwtService jwtService;
 
-    @GetMapping("/profile")
-    public ResponseEntity<UserProfileDto> userProfile(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        UserProfileDto profile = userService.getUserProfile(currentUser.getUserId());
-        return ResponseEntity.ok(profile);
-    }
 
     @PostMapping("/upload-avatar")
     public ResponseEntity<String> uploadAvatar(@RequestParam("avatar") MultipartFile avatar) {
@@ -67,12 +60,5 @@ public class UserController {
         } else {
             return ResponseEntity.badRequest().body(new LoginResponse(null, "Username is already taken."));
         }
-    }
-
-
-    @GetMapping("/{userId}/topics")
-    public ResponseEntity<List<Topic>> getUserTopics(@PathVariable Long userId) {
-        List<Topic> topics = userService.getUserTopics(userId);
-        return ResponseEntity.ok(topics);
     }
 }

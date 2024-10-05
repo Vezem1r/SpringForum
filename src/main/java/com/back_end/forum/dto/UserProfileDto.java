@@ -1,8 +1,10 @@
 package com.back_end.forum.dto;
 
+import com.back_end.forum.responses.TopicResponseDto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class UserProfileDto {
@@ -14,4 +16,5 @@ public class UserProfileDto {
     private int commentCount;
     private int topicCount;
     private String profilePicture;
+    private List<TopicResponseDto> topics;
 }
