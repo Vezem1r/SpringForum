@@ -33,6 +33,8 @@ public class SecurityConfig {
                         .requestMatchers("/topicpage/**").permitAll()
                         .requestMatchers("/profilepage/**").permitAll()
                         .requestMatchers("/avatars/**").permitAll()
+                        .requestMatchers("/banners/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

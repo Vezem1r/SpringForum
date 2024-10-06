@@ -54,6 +54,4 @@ public class HomePageController {
 
         return topicService.searchTopics(title, category, tagList, minRating, maxRating, sortField, sortDirection, pageable);
     }
-
-
 }
