@@ -11,6 +11,7 @@ import java.util.List;
 public class TopicPageResponse {
     private Long topicId;
     private String title;
+    private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String username;

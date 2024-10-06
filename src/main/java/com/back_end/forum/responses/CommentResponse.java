@@ -14,8 +14,10 @@ public class CommentResponse {
     private LocalDateTime createdAt;
     private String username;
     private Long parentId;
+    private Integer rating;
     private int replyCount;
     private List<CommentResponse> replies;
+    private List<AttachmentResponse> attachments;
 
     public List<CommentResponse> getReplies() {
         return replies;

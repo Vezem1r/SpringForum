@@ -7,6 +7,7 @@ import com.back_end.forum.service.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class HomePageController {
 
 
     @GetMapping("/getAllTopics")
-    public Page<TopicResponseDto> getAllTopics(Pageable pageable) {
+    public Page<TopicResponseDto> getAllTopics(@PageableDefault(value = 15) Pageable pageable) {
         return topicService.getAllTopics(pageable);
     }
 

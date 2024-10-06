@@ -40,15 +40,6 @@ public class TopicPageController {
         Page<CommentResponse> replies = commentService.getCommentReplies(commentId, pageable);
         return ResponseEntity.ok(replies);
     }
-
-    @GetMapping("/attachments/{id}")
-    public ResponseEntity<Resource> getAttachment(@PathVariable Long id) {
-        Resource resource = attachmentService.loadAttachment(id);
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(resource);
-    }
-
     @GetMapping("/attachments/download/{id}")
     public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id) {
         try {
@@ -66,4 +57,15 @@ public class TopicPageController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+
+    @GetMapping("/attachments/{id}")
+    public ResponseEntity<Resource> getAttachment(@PathVariable Long id) {
+        Resource resource = attachmentService.loadAttachment(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(resource);
+    }
+
+
 }

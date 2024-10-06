@@ -43,7 +43,7 @@ public class Comment {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
     private Set<Comment> replies;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Attachment> attachments = new ArrayList<>();
 

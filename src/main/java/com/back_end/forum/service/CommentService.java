@@ -2,9 +2,11 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.model.*;
+import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
+import com.back_end.forum.responses.AttachmentResponse;
 import com.back_end.forum.responses.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TopicRepository topicRepository;
     private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
 
     public Comment addComment(CommentDto commentDto, String username) throws IOException {
         Comment comment = new Comment();
@@ -50,6 +53,8 @@ public class CommentService {
         if (commentDto.getAttachments() != null) {
             for (MultipartFile attachmentFile : commentDto.getAttachments()) {
                 Attachment attachment = attachmentService.saveAttachment(attachmentFile);
+                attachment.setComment(savedComment);
+                attachmentRepository.save(attachment);
                 comment.addAttachment(attachment);
             }
         }
@@ -70,15 +75,30 @@ public class CommentService {
                     comment.getCreatedAt(),
                     comment.getUser().getUsername(),
                     parentId,
+                    comment.getRating(),
                     commentRepository.countByParentComment_CommentId(comment.getCommentId()),
+                    new ArrayList<>(),
                     new ArrayList<>()
             );
 
             List<CommentResponse> childReplies = loadChildReplies(comment.getCommentId());
             dto.setReplies(childReplies);
 
+            List<AttachmentResponse> attachments = loadAttachmentsForComment(comment);
+            dto.setAttachments(attachments);
+
             return dto;
         });
+    }
+
+    private List<AttachmentResponse> loadAttachmentsForComment(Comment comment) {
+        return comment.getAttachments().stream()
+                .map(attachment -> new AttachmentResponse(
+                        attachment.getId(),
+                        attachment.getFilename(),
+                        attachment.getFilePath()
+                ))
+                .collect(Collectors.toList());
     }
 
     private List<CommentResponse> loadChildReplies(Long parentId) {
@@ -92,12 +112,17 @@ public class CommentService {
                     reply.getCreatedAt(),
                     reply.getUser().getUsername(),
                     parentId,
+                    reply.getRating(),
                     commentRepository.countByParentComment_CommentId(reply.getCommentId()),
+                    new ArrayList<>(),
                     new ArrayList<>()
             );
 
             List<CommentResponse> childReplies = loadChildReplies(reply.getCommentId());
             replyDto.setReplies(childReplies);
+
+            List<AttachmentResponse> attachments = loadAttachmentsForComment(reply);
+            replyDto.setAttachments(attachments);
 
             return replyDto;
         }).collect(Collectors.toList());

@@ -125,7 +125,7 @@ public class TopicService {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new RuntimeException("Topic not found"));
 
-        String bannerUrl = topic.getBanner().getFilePath();
+        String bannerUrl = topic.getBanner() != null ? topic.getBanner().getFilePath() : null;
 
         List<AttachmentResponse> attachmentResponses = attachmentRepository.findByTopic_Id(topicId)
                 .stream()
@@ -138,20 +138,32 @@ public class TopicService {
 
         Page<Comment> commentPage = commentRepository.findByTopic_IdAndParentCommentIsNull(topicId, pageable);
         List<CommentResponse> commentResponses = commentPage.getContent().stream()
-                .map(comment -> new CommentResponse(
-                        comment.getCommentId(),
-                        comment.getContent(),
-                        comment.getCreatedAt(),
-                        comment.getUser().getUsername(),
-                        null,
-                        commentRepository.countByParentComment_CommentId(comment.getCommentId()),
-                        new ArrayList<>()
-                ))
+                .map(comment -> {
+                    List<AttachmentResponse> commentAttachments = comment.getAttachments().stream()
+                            .map(attachment -> new AttachmentResponse(
+                                    attachment.getId(),
+                                    attachment.getFilename(),
+                                    "/comment/attachments/download/" + attachment.getId()))
+                            .collect(Collectors.toList());
+
+                    return new CommentResponse(
+                            comment.getCommentId(),
+                            comment.getContent(),
+                            comment.getCreatedAt(),
+                            comment.getUser().getUsername(),
+                            null,
+                            comment.getRating(),
+                            commentRepository.countByParentComment_CommentId(comment.getCommentId()),
+                            new ArrayList<>(),
+                            commentAttachments
+                    );
+                })
                 .collect(Collectors.toList());
 
         return new TopicPageResponse(
                 topic.getId(),
                 topic.getTitle(),
+                topic.getContent(),
                 topic.getCreatedAt(),
                 topic.getUpdatedAt(),
                 topic.getUser().getUsername(),
