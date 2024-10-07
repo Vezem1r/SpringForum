@@ -6,15 +6,15 @@ import com.back_end.forum.responses.TopicResponseDto;
 import com.back_end.forum.service.TopicService;
 import com.back_end.forum.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/profilepage")
@@ -25,7 +25,9 @@ public class ProfilePageController {
     private final UserService userService;
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserProfileDto> getProfile(@PathVariable String username){
+    public ResponseEntity<Map<String, Object>> getProfile(@PathVariable String username,
+                                                          @RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "10") int size){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -44,9 +46,16 @@ public class ProfilePageController {
             profileDto.setEmail(null);
         }
 
-        List<TopicResponseDto> userTopics = topicService.getUserTopicsByUsername(username);
-        profileDto.setTopics(userTopics);
+        Page<TopicResponseDto> userTopics = topicService.getUserTopicsByUsername(username, page, size);
+        profileDto.setTopics(userTopics.getContent());
 
-        return ResponseEntity.ok(profileDto);
+        // responce for pagination
+        Map<String, Object> response = new HashMap<>();
+        response.put("profile", profileDto);
+        response.put("totalPages", userTopics.getTotalPages());
+        response.put("totalElements", userTopics.getTotalElements());
+
+        return ResponseEntity.ok(response);
     }
+
 }

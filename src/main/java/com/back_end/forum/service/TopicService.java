@@ -177,10 +177,11 @@ public class TopicService {
         );
     }
 
-    public List<TopicResponseDto> getUserTopicsByUsername(String username){
-        List<Topic> topics = topicRepository.findAllByUser_Username(username);
+    public Page<TopicResponseDto> getUserTopicsByUsername(String username, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Topic> topics = topicRepository.findAllByUser_Username(username, pageable);
 
-        return topics.stream().map(topic -> new TopicResponseDto(
+        return topics.map(topic -> new TopicResponseDto(
                 topic.getId(),
                 topic.getTitle(),
                 topic.getCreatedAt(),
@@ -189,6 +190,6 @@ public class TopicService {
                 topic.getCategory().getName(),
                 topic.getTags().stream().map(Tag::getName).collect(Collectors.toList()),
                 topic.getRating()
-        )).collect(Collectors.toList());
+        ));
     }
 }
