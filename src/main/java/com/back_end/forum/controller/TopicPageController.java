@@ -38,6 +38,12 @@ public class TopicPageController {
         return ResponseEntity.ok(topicPageResponse);
     }
 
+    @GetMapping("/comments/{commentId}/rating")
+    public ResponseEntity<Integer> getCommentRating(@PathVariable Long commentId) {
+        Integer rating = commentService.getCommentRating(commentId);
+        return ResponseEntity.ok(rating);
+    }
+
     @GetMapping("/{commentId}/replies")
     public ResponseEntity<Page<CommentResponse>> getCommentReplies(@PathVariable Long commentId, @PageableDefault(size = 4) Pageable pageable){
         Page<CommentResponse> replies = commentService.getCommentReplies(commentId, pageable);

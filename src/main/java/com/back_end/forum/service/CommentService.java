@@ -128,4 +128,10 @@ public class CommentService {
             return replyDto;
         }).collect(Collectors.toList());
     }
+
+    public Integer getCommentRating(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        return comment.getRating();
+    }
 }
