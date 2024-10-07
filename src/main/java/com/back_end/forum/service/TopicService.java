@@ -17,10 +17,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -161,6 +163,11 @@ public class TopicService {
                 })
                 .collect(Collectors.toList());
 
+        long totalComments = commentRepository.countByTopic_IdAndParentCommentIsNull(topicId);
+        System.out.println(totalComments);
+        int totalPages = (int) Math.ceil((double) totalComments / pageable.getPageSize());
+        System.out.println(pageable.getPageSize());
+
         return new TopicPageResponse(
                 topic.getId(),
                 topic.getTitle(),
@@ -173,7 +180,8 @@ public class TopicService {
                 topic.getRating(),
                 bannerUrl,
                 attachmentResponses,
-                commentResponses
+                commentResponses,
+                totalPages
         );
     }
 

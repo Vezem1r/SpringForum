@@ -33,13 +33,13 @@ public class TopicPageController {
     private final CommentService commentService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<TopicPageResponse> getTopicPage(@PathVariable Long id, @PageableDefault(size = 10) Pageable pageable){
+    public ResponseEntity<TopicPageResponse> getTopicPage(@PathVariable Long id, @PageableDefault(size = 5) Pageable pageable){
         TopicPageResponse topicPageResponse = topicService.getTopicPageById(id, pageable);
         return ResponseEntity.ok(topicPageResponse);
     }
 
     @GetMapping("/{commentId}/replies")
-    public ResponseEntity<Page<CommentResponse>> getCommentReplies(@PathVariable Long commentId, Pageable pageable){
+    public ResponseEntity<Page<CommentResponse>> getCommentReplies(@PathVariable Long commentId, @PageableDefault(size = 4) Pageable pageable){
         Page<CommentResponse> replies = commentService.getCommentReplies(commentId, pageable);
         return ResponseEntity.ok(replies);
     }

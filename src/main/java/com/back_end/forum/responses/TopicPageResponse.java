@@ -21,4 +21,5 @@ public class TopicPageResponse {
     private String bannerUrl;
     private List<AttachmentResponse> attachments;
     private List<CommentResponse> comments;
+    private int totalPages;
 }
