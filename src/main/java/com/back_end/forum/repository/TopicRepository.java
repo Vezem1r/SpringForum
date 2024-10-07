@@ -13,4 +13,6 @@ public interface TopicRepository extends JpaRepository<Topic, Long>, JpaSpecific
 
     List<Topic> findAllByUser_Username(String username);
 
+    List<Topic> findByUser(User user);
+
 }

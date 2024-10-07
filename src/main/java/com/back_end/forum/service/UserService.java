@@ -1,6 +1,8 @@
 package com.back_end.forum.service;
 
 import com.back_end.forum.dto.UserProfileDto;
+import com.back_end.forum.model.Comment;
+import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
@@ -58,6 +60,20 @@ public class UserService {
         int topicCount = topicRepository.countByUser(user);
         profileDto.setCommentCount(commentCount);
         profileDto.setTopicCount(topicCount);
+
+        int totalRating = 0;
+
+        List<Topic> topics = topicRepository.findByUser(user);
+        for (Topic topic : topics) {
+            totalRating += topic.getRating();
+        }
+
+        List<Comment> comments = commentRepository.findByUser(user);
+        for (Comment comment : comments) {
+            totalRating += comment.getRating();
+        }
+
+        profileDto.setRating(totalRating);
 
         return profileDto;
     }

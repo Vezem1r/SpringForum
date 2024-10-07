@@ -21,4 +21,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findByParentComment_CommentId(Long parentId, Pageable pageable);
 
     int countByParentComment_CommentId(Long parentId);
+
+    List<Comment> findByUser(User user);
 }

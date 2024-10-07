@@ -17,4 +17,5 @@ public class UserProfileDto {
     private int topicCount;
     private String profilePicture;
     private List<TopicResponseDto> topics;
+    private int rating;
 }
