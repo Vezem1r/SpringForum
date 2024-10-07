@@ -1,6 +1,9 @@
 package com.back_end.forum.controller;
 
+import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.model.Attachment;
+import com.back_end.forum.model.Comment;
+import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.responses.CommentResponse;
 import com.back_end.forum.responses.TopicPageResponse;
 import com.back_end.forum.service.AttachmentService;
@@ -40,14 +43,12 @@ public class TopicPageController {
         Page<CommentResponse> replies = commentService.getCommentReplies(commentId, pageable);
         return ResponseEntity.ok(replies);
     }
-    @GetMapping("/attachments/download/{id}")
-    public ResponseEntity<Resource> downloadAttachment(@PathVariable Long id) {
+    @GetMapping("/attachments/download/{attachmentId}")
+    public ResponseEntity<Resource> downloadCommentAttachment(@PathVariable Long attachmentId) {
         try {
-            Attachment attachment = attachmentService.getAttachment(id);
+            Attachment attachment = attachmentService.getAttachment(attachmentId);
             String filename = attachment.getFilename();
-            //String filePath = attachment.getFilePath();
-
-            Resource resource = attachmentService.loadAttachment(id);
+            Resource resource = attachmentService.loadAttachment(attachmentId);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(attachment.getContentType()))
@@ -57,6 +58,24 @@ public class TopicPageController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+
+    @GetMapping("/topics/{topicId}/attachments/download/{attachmentId}")
+    public ResponseEntity<Resource> downloadTopicAttachment(@PathVariable Long topicId, @PathVariable Long attachmentId) {
+        try {
+            Attachment attachment = attachmentService.getAttachment(attachmentId);
+            String filename = attachment.getFilename();
+            Resource resource = attachmentService.loadAttachment(attachmentId);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(attachment.getContentType()))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .body(resource);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 
 
     @GetMapping("/attachments/{id}")

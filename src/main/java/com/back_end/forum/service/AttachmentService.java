@@ -37,18 +37,9 @@ public class AttachmentService {
         return attachmentRepository.save(attachment);
     }
 
-    private String getFileExtension(String filename) {
-        return filename.substring(filename.lastIndexOf('.') + 1);
-    }
-
     public Attachment getAttachment(Long id) {
         return attachmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Attachment not found"));
-    }
-
-    public byte[] getFileContent(String filePath) throws IOException {
-        Path path = Paths.get(filePath);
-        return Files.readAllBytes(path);
     }
 
     public Resource loadAttachment(Long id) {

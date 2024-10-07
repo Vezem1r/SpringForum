@@ -33,8 +33,4 @@ public class BannerService {
         banner.setCreatedAt(LocalDateTime.now());
         return bannerRepository.save(banner);
     }
-
-    private String getFileExtension(String filename) {
-        return filename.substring(filename.lastIndexOf('.') + 1);
-    }
 }

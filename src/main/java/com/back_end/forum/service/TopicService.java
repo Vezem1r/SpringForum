@@ -66,6 +66,7 @@ public class TopicService {
             if (topicDTO.getAttachments() != null) {
                 for (MultipartFile attachmentFile : topicDTO.getAttachments()) {
                     Attachment attachment = attachmentService.saveAttachment(attachmentFile);
+                    attachmentRepository.save(attachment);
                     topic.addAttachment(attachment);
                 }
             }
