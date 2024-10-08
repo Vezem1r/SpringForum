@@ -8,12 +8,12 @@ Additionally, the application utilizes **SMTP** for sending emails, providing us
 
 ---
 
-## Frontend Repository
+## <span style="color: #6b5b9a;">Frontend Repository</span>
 Find the frontend part of this project [here](https://github.com/Vezem1r/SpringForumFrontend).
 
 ---
 
-## Roles and Permissions
+## <span style="color: #6b5b9a;">Roles and Permissions</span>
 
 This forum application includes various roles, each with different permissions:
 
@@ -41,7 +41,7 @@ This forum application includes various roles, each with different permissions:
 
 ---
 
-## Technologies Used
+## <span style="color: #6b5b9a;">Technologies Used</span>
 
 This project is built with the following technologies:
 
@@ -61,7 +61,7 @@ This project is built with the following technologies:
 
 ---
 
-## How to Build the Project
+## <span style="color: #6b5b9a;">How to Build the Project</span>
 
 To set up and run the backend project locally, follow these steps:
 
