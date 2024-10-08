@@ -4,7 +4,7 @@
 It supports features such as user authentication, real-time communication using **WebSockets**, and the ability to create topics with banners and attachments.
 Additionally, the application utilizes **SMTP** for sending emails, providing users with essential email verification.
 
-![Forum Screenshot](screenshot.png)
+![Forum fast :) preview](src/main/resources/preview.gif)
 
 ---
 

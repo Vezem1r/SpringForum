@@ -53,10 +53,14 @@ public class CommentService {
 
         if (commentDto.getAttachments() != null) {
             for (MultipartFile attachmentFile : commentDto.getAttachments()) {
-                Attachment attachment = attachmentService.saveAttachment(attachmentFile);
-                attachment.setComment(savedComment);
-                attachmentRepository.save(attachment);
-                comment.addAttachment(attachment);
+                if (attachmentFile != null && !attachmentFile.isEmpty()) {
+                    Attachment attachment = attachmentService.saveAttachment(attachmentFile);
+                    if (attachment != null) {
+                        attachment.setComment(savedComment);
+                        attachmentRepository.save(attachment);
+                        comment.addAttachment(attachment);
+                    }
+                }
             }
         }
         return savedComment;
