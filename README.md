@@ -4,6 +4,13 @@
 It supports features such as user authentication, real-time communication using **WebSockets**, and the ability to create topics with banners and attachments.
 Additionally, the application utilizes **SMTP** for sending emails, providing users with essential email verification.
 
+- [ ] Add private chat using websocket
+- [ ] Add private notifications using websocket
+- [ ] Add Admin and guest roles with their functionality
+- [ ] Add logger
+- [ ] Add docker composer
+- [ ] Deploy
+
 ![Forum fast :) preview](src/main/resources/preview.gif)
 
 ---
@@ -17,7 +24,7 @@ Find the frontend part of this project [here](https://github.com/Vezem1r/SpringF
 
 This forum application includes various roles, each with different permissions:
 
-- **Admin** (Not implemented yet)
+- ~~**Admin**~~ (Not implemented yet)
   - 🛠️ Full access to the forum.
   - 👥 Can manage users, topics, comments, categories, and tags.
 
@@ -27,13 +34,13 @@ This forum application includes various roles, each with different permissions:
   - 👍👎 Can upvote and downvote topics and comments.
   - 👤 Has a personal profile displaying their personal information (email is hidden to other users), topics, and overall rating.
   - ✏️ Can change their username, avatar, and password with email verification.
-  - 📩 Can send messages to different users and receive messages.
-  - 🔔 Has personal notifications for:
+  - 📩 ~~Can send messages to different users and receive messages.~~
+  - 🔔 ~~Has personal notifications for:~~
     - 🆕 New comments on their topics.
     - 📊 Changes in the rating of their topics or comments.
     - ✉️ Personal messages.
 
-- **Guest**
+- ~~**Guest**~~ (Not implemented yet)
   - 👁️ Can view users' profiles, topics, and comments.
   - 🔍 Can search for topics based on various criteria.
   - 🆕 Can log in or register with email verification.
