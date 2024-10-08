@@ -155,4 +155,9 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+
+    public User findByUsername(String username){
+        return userRepository.findByUsername(username)
+                .orElseThrow(()->new IllegalArgumentException("User not found"));
+    }
 }
