@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/avatars/**").permitAll()
                         .requestMatchers("/banners/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui**/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
