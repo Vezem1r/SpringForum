@@ -4,6 +4,7 @@ import com.back_end.forum.model.Comment;
 import com.back_end.forum.model.Rating;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
+import com.back_end.forum.model.enums.NotificationType;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.RatingRepository;
 import com.back_end.forum.repository.TopicRepository;
@@ -28,6 +29,9 @@ public class RatingService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public String rateTopic(Long topicId, Long userId, int value) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -35,6 +39,9 @@ public class RatingService {
                 .orElseThrow(() -> new RuntimeException("Topic not found"));
 
         Optional<Rating> existingRating = ratingRepository.findByUserAndTopic(user, topic);
+
+        int previousTopicRating = topic.getRating();
+        User notUser = topic.getUser();
 
         if (existingRating.isPresent()) {
             Rating rating = existingRating.get();
@@ -44,6 +51,12 @@ public class RatingService {
 
             topic.setRating(topic.getRating() - previousValue + value);
             topicRepository.save(topic);
+
+            int newTopicRating = topic.getRating();
+
+            if(!user.equals(notUser) && previousTopicRating != newTopicRating) {
+                notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your topic, new value: " + topic.getRating(), NotificationType.LIKE, topicId);
+            }
             return "Rating updated successfully";
         } else {
             Rating rating = new Rating();
@@ -54,6 +67,10 @@ public class RatingService {
 
             topic.setRating(topic.getRating() + value);
             topicRepository.save(topic);
+
+            if(!user.equals(notUser)) {
+                notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your topic, new value: " + topic.getRating(), NotificationType.LIKE, topicId);
+            }
             return "Rating added successfully";
         }
 
@@ -66,6 +83,9 @@ public class RatingService {
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
         Optional<Rating> existingRating = ratingRepository.findByUserAndComment(user, comment);
+        User notUser = comment.getUser();
+
+        int previousCommentRating = comment.getRating();
 
         if (existingRating.isPresent()) {
             Rating rating = existingRating.get();
@@ -75,18 +95,25 @@ public class RatingService {
 
             comment.setRating(comment.getRating() - previousValue + value);
             commentRepository.save(comment);
+            int newCommentRating = comment.getRating();
+            if(!user.equals(notUser) && previousCommentRating!=newCommentRating) {
+                notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your comment: " + comment.getContent() +", new value: " + comment.getRating(), NotificationType.LIKE, comment.getTopic().getId());
+            }
             return "Rating updated successfully";
-        } else {
-            Rating rating = new Rating();
-            rating.setUser(user);
-            rating.setComment(comment);
-            rating.setValue(value);
-            ratingRepository.save(rating);
-
-            comment.setRating(comment.getRating() + value);
-            commentRepository.save(comment);
-            return "Rating added successfully";
         }
+        Rating rating = new Rating();
+        rating.setUser(user);
+        rating.setComment(comment);
+        rating.setValue(value);
+        ratingRepository.save(rating);
+
+        comment.setRating(comment.getRating() + value);
+        commentRepository.save(comment);
+
+        if(!user.equals(notUser)) {
+            notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your comment: " + comment.getContent() +", new value: " + comment.getRating(), NotificationType.LIKE, comment.getTopic().getId());
+        }
+        return "Rating added successfully";
     }
 }
 

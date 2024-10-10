@@ -2,6 +2,7 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.model.*;
+import com.back_end.forum.model.enums.NotificationType;
 import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Console;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class CommentService {
     private final TopicRepository topicRepository;
     private final AttachmentService attachmentService;
     private final AttachmentRepository attachmentRepository;
+    private final NotificationService notificationService;
 
     public Comment addComment(CommentDto commentDto, String username) throws IOException {
         Comment comment = new Comment();
@@ -48,6 +51,16 @@ public class CommentService {
         topicRepository.save(topic);
         comment.setTopic(topic);
         comment.setParentComment(commentDto.getParentId() != null ? findCommentById(commentDto.getParentId()) : null);
+
+        if(commentDto.getParentId() != null) {
+            Optional<Comment> notificationComment = commentRepository.findById(commentDto.getParentId());
+            User notificationUser = notificationComment.get().getUser();
+            if (!user.equals(notificationUser)) {
+                notificationService.createNotification(notificationUser.getUsername(), user.getUsername(), "Replied on your comment.", NotificationType.REPLY, topic.getId());
+            }
+        } else if (!topic.getUser().equals(user)) {
+            notificationService.createNotification(topic.getUser().getUsername(), user.getUsername(), "Commented your topic.",NotificationType.COMMENT, topic.getId());
+        }
 
         Comment savedComment = commentRepository.save(comment);
 

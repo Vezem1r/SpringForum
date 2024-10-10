@@ -31,12 +31,16 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/homepage/**").permitAll()
-                        .requestMatchers("/topicpage/**").permitAll()
-                        .requestMatchers("/profilepage/**").permitAll()
-                        .requestMatchers("/avatars/**").permitAll()
-                        .requestMatchers("/banners/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(
+                                "/homepage/**",
+                                "/topicpage/**",
+                                "/profilepage/**")
+                        .permitAll()
+                        .requestMatchers(
+                                "/avatars/**",
+                                "/banners/**",
+                                "/uploads/**")
+                        .permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui**/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session

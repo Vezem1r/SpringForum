@@ -24,35 +24,35 @@ public class MessageService {
     @Autowired
     private NotificationService notificationService;
 
-    public Message sendMessage(Long senderId, Long receiverId, String content) {
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
-        User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
-
-        Message message = new Message();
-        message.setSender(sender);
-        message.setReceiver(receiver);
-        message.setContent(content);
-        message.setTimestamp(LocalDateTime.now());
-
-        Notification notification = notificationService.createNotification(receiverId,
-                "You have new private message: " + content);
-
-        return messageRepository.save(message);
-    }
-
-    public List<Message> getMessages(Long userId1, Long userId2) {
-        User user1 = userRepository.findById(userId1)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        User user2 = userRepository.findById(userId2)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<Message> messages = messageRepository.findBySenderAndReceiver(user1, user2);
-        messages.addAll(messageRepository.findByReceiverAndSender(user1, user2));
-        messages.sort(Comparator.comparing(Message::getTimestamp));
-
-        return messages;
-    }
+//    public Message sendMessage(Long senderId, Long receiverId, String content) {
+//        User sender = userRepository.findById(senderId)
+//                .orElseThrow(() -> new RuntimeException("Sender not found"));
+//        User receiver = userRepository.findById(receiverId)
+//                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+//
+//        Message message = new Message();
+//        message.setSender(sender);
+//        message.setReceiver(receiver);
+//        message.setContent(content);
+//        message.setTimestamp(LocalDateTime.now());
+//
+//        Notification notification = notificationService.createNotification(receiverId,
+//                "You have new private message: " + content);
+//
+//        return messageRepository.save(message);
+//    }
+//
+//    public List<Message> getMessages(Long userId1, Long userId2) {
+//        User user1 = userRepository.findById(userId1)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//        User user2 = userRepository.findById(userId2)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        List<Message> messages = messageRepository.findBySenderAndReceiver(user1, user2);
+//        messages.addAll(messageRepository.findByReceiverAndSender(user1, user2));
+//        messages.sort(Comparator.comparing(Message::getTimestamp));
+//
+//        return messages;
+//    }
 }
 

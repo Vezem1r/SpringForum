@@ -1,4 +1,4 @@
-package com.back_end.forum.controller;
+package com.back_end.forum.controller.pages;
 
 import com.back_end.forum.responses.TopicResponseDto;
 import com.back_end.forum.model.Category;

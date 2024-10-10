@@ -1,9 +1,9 @@
 package com.back_end.forum.model;
 
-import jakarta.persistence.*;
+import com.back_end.forum.model.enums.NotificationType;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,17 +16,24 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private String recipientUsername;
+
+    @Column(nullable = false)
+    private String actorUsername;
+
+    @Column(nullable = false)
+    private NotificationType notificationType;
 
     @Column(nullable = false)
     private String message;
+
+    @Column(nullable = false)
+    private Long topicId;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
     @Column(nullable = false)
     private boolean isRead = false;
-
 }
