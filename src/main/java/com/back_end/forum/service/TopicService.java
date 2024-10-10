@@ -8,6 +8,7 @@ import com.back_end.forum.responses.AttachmentResponse;
 import com.back_end.forum.responses.CommentResponse;
 import com.back_end.forum.responses.TopicPageResponse;
 import com.back_end.forum.responses.TopicResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TopicService {
 
     private final TopicRepository topicRepository;
@@ -46,23 +46,29 @@ public class TopicService {
             topic.setUpdatedAt(LocalDateTime.now());
 
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new RuntimeException("User not found");
+                });
             topic.setUser(user);
 
             topic.setCategory(categoryRepository.findById(topicDTO.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found")));
-
+                .orElseThrow(() -> {
+                    log.error("Category not found with id: {}", topicDTO.getCategoryId());
+                    return new RuntimeException("Category not found");
+                }));
             Set<Tag> tags = tagService.getOrCreateTags(topicDTO.getTagNames());
             topic.setTags(tags);
 
             topic.setRating(0);
 
             Topic savedTopic = topicRepository.save(topic);
+            log.info("Created new topic: {}", savedTopic.getTitle());
 
             if (topicDTO.getBanner() != null) {
                 Banner banner = bannerService.saveBanner(topicDTO.getBanner());
                 topic.setBanner(banner);
+                log.info("Added banner to topic: {}", savedTopic.getTitle());
             }
 
             if (topicDTO.getAttachments() != null) {
@@ -70,6 +76,7 @@ public class TopicService {
                     Attachment attachment = attachmentService.saveAttachment(attachmentFile);
                     attachmentRepository.save(attachment);
                     topic.addAttachment(attachment);
+                    log.info("Added attachment to topic: {}, attachment filename: {}", savedTopic.getTitle(), attachment.getFilename());
                 }
             }
 
@@ -77,6 +84,7 @@ public class TopicService {
     }
     public Page<TopicResponseDto> getAllTopics(Pageable pageable) {
         Page<Topic> topicPage = topicRepository.findAll(pageable);
+        log.info("Retrieved all topics, total count: {}", topicPage.getTotalElements());
 
         return topicPage.map(topic -> new TopicResponseDto(
                 topic.getId(),
@@ -106,6 +114,7 @@ public class TopicService {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
         Page<Topic> topicPage = topicRepository.findAll(spec, sortedPageable);
+        log.info("Searched topics with title: {}, category: {}, tags: {}, total count: {}", title, category, tags, topicPage.getTotalElements());
 
         return topicPage.map(this::convertToDto);
     }
@@ -126,8 +135,10 @@ public class TopicService {
 
     public TopicPageResponse getTopicPageById(Long topicId, Pageable pageable) {
         Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new RuntimeException("Topic not found"));
-
+                .orElseThrow(() -> {
+                    log.error("Topic not found with id: {}", topicId);
+                    return new RuntimeException("Topic not found");
+                });
         String bannerUrl = topic.getBanner() != null ? topic.getBanner().getFilePath() : null;
 
         List<AttachmentResponse> attachmentResponses = attachmentRepository.findByTopic_Id(topicId)
@@ -164,9 +175,8 @@ public class TopicService {
                 .collect(Collectors.toList());
 
         long totalComments = commentRepository.countByTopic_IdAndParentCommentIsNull(topicId);
-        System.out.println(totalComments);
         int totalPages = (int) Math.ceil((double) totalComments / pageable.getPageSize());
-        System.out.println(pageable.getPageSize());
+        log.info("Retrieved topic page with id: {}, total comments: {}, total pages: {}", topicId, totalComments, totalPages);
 
         return new TopicPageResponse(
                 topic.getId(),
@@ -188,6 +198,7 @@ public class TopicService {
     public Page<TopicResponseDto> getUserTopicsByUsername(String username, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Topic> topics = topicRepository.findAllByUser_Username(username, pageable);
+        log.info("Retrieved topics for user: {}, total count: {}", username, topics.getTotalElements());
 
         return topics.map(topic -> new TopicResponseDto(
                 topic.getId(),

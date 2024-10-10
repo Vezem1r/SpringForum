@@ -9,34 +9,34 @@ import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.RatingRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class RatingService {
 
-    @Autowired
-    private RatingRepository ratingRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TopicRepository topicRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private NotificationService notificationService;
+    private final RatingRepository ratingRepository;
+    private final UserRepository userRepository;
+    private final TopicRepository topicRepository;
+    private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
     public String rateTopic(Long topicId, Long userId, int value) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with id: {}", userId);
+                    return new RuntimeException("User not found");
+                });
         Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new RuntimeException("Topic not found"));
+                .orElseThrow(() -> {
+                    log.error("Topic not found with id: {}", topicId);
+                    return new RuntimeException("Topic not found");
+                });
 
         Optional<Rating> existingRating = ratingRepository.findByUserAndTopic(user, topic);
 
@@ -53,9 +53,11 @@ public class RatingService {
             topicRepository.save(topic);
 
             int newTopicRating = topic.getRating();
+            log.info("Updated rating for topic {} by user {}. New rating: {}", topicId, userId, newTopicRating);
 
-            if(!user.equals(notUser) && previousTopicRating != newTopicRating) {
-                notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your topic, new value: " + topic.getRating(), NotificationType.LIKE, topicId);
+            if (!user.equals(notUser) && previousTopicRating != newTopicRating) {
+                notificationService.createNotification(notUser.getUsername(), user.getUsername(),
+                        "Rated your topic, new value: " + topic.getRating(), NotificationType.LIKE, topicId);
             }
             return "Rating updated successfully";
         } else {
@@ -68,6 +70,8 @@ public class RatingService {
             topic.setRating(topic.getRating() + value);
             topicRepository.save(topic);
 
+            log.info("Added new rating for topic {} by user {}. New rating: {}", topicId, userId, topic.getRating());
+
             if(!user.equals(notUser)) {
                 notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your topic, new value: " + topic.getRating(), NotificationType.LIKE, topicId);
             }
@@ -78,13 +82,18 @@ public class RatingService {
 
     public String rateComment(Long commentId, Long userId, int value) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with id: {}", userId);
+                    return new RuntimeException("User not found");
+                });
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> {
+                    log.error("Comment not found with id: {}", commentId);
+                    return new RuntimeException("Comment not found");
+                });
 
         Optional<Rating> existingRating = ratingRepository.findByUserAndComment(user, comment);
         User notUser = comment.getUser();
-
         int previousCommentRating = comment.getRating();
 
         if (existingRating.isPresent()) {
@@ -96,6 +105,7 @@ public class RatingService {
             comment.setRating(comment.getRating() - previousValue + value);
             commentRepository.save(comment);
             int newCommentRating = comment.getRating();
+            log.info("Updated rating for comment {} by user {}. New rating: {}", commentId, userId, newCommentRating);
             if(!user.equals(notUser) && previousCommentRating!=newCommentRating) {
                 notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your comment: " + comment.getContent() +", new value: " + comment.getRating(), NotificationType.LIKE, comment.getTopic().getId());
             }
@@ -109,6 +119,8 @@ public class RatingService {
 
         comment.setRating(comment.getRating() + value);
         commentRepository.save(comment);
+
+        log.info("Added new rating for comment {} by user {}. New rating: {}", commentId, userId, comment.getRating());
 
         if(!user.equals(notUser)) {
             notificationService.createNotification(notUser.getUsername(), user.getUsername(),"Rated your comment: " + comment.getContent() +", new value: " + comment.getRating(), NotificationType.LIKE, comment.getTopic().getId());

@@ -4,6 +4,7 @@ import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.model.Comment;
 import com.back_end.forum.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/comments")
 @RequiredArgsConstructor
+@Slf4j
 public class CommentController {
 
     private final CommentService commentService;
@@ -25,8 +27,10 @@ public class CommentController {
 
         try {
             Comment createdComment = commentService.addComment(commentDto, username);
+            log.info("Comment successfully created by user {}", username);
             return ResponseEntity.ok(createdComment);
         } catch (IOException e) {
+            log.error("Error occurred while creating comment for user {}", username, e);
             return ResponseEntity.internalServerError().build();
         }
     }

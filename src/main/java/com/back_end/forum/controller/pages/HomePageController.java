@@ -5,6 +5,7 @@ import com.back_end.forum.model.Category;
 import com.back_end.forum.service.CategoryService;
 import com.back_end.forum.service.TopicService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/homepage")
 @RequiredArgsConstructor
+@Slf4j
 public class HomePageController {
 
     private final TopicService topicService;
@@ -51,7 +53,7 @@ public class HomePageController {
         String sortField = sortParams[0];
         String sortDirection = sortParams.length > 1 ? sortParams[1] : "desc";
 
-        System.out.println("Sorting by: " + sortField + " in direction: " + sortDirection);
+        log.info("Sorting by: {} in direction: {}", sortField, sortDirection);
 
         return topicService.searchTopics(title, category, tagList, minRating, maxRating, sortField, sortDirection, pageable);
     }

@@ -3,6 +3,7 @@ package com.back_end.forum.controller;
 import com.back_end.forum.model.User;
 import com.back_end.forum.service.RatingService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/ratings")
 @AllArgsConstructor
+@Slf4j
 public class RatingController {
 
-    private RatingService ratingService;
+    private final RatingService ratingService;
 
     @PostMapping("/topic/{topicId}")
     public ResponseEntity<String> rateTopic(@PathVariable Long topicId,
@@ -22,7 +24,15 @@ public class RatingController {
         User currentUser = (User) authentication.getPrincipal();
         Long userId = currentUser.getUserId();
 
-        String response = ratingService.rateTopic(topicId, userId, value);
+        log.info("User {} is rating topic {} with value {}", userId, topicId, value);
+        String response;
+        try {
+            response = ratingService.rateTopic(topicId, userId, value);
+            log.info("User {} successfully rated topic {}", userId, topicId);
+        } catch (Exception e) {
+            log.error("Error rating topic {} by user {}: {}", topicId, userId, e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to rate topic");
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -33,7 +43,15 @@ public class RatingController {
         User currentUser = (User) authentication.getPrincipal();
         Long userId = currentUser.getUserId();
 
-        String response = ratingService.rateComment(commentId, userId, value);
+        log.info("User {} is rating comment {} with value {}", userId, commentId, value);
+        String response;
+        try {
+            response = ratingService.rateComment(commentId, userId, value);
+            log.info("User {} successfully rated comment {}", userId, commentId);
+        } catch (Exception e) {
+            log.error("Error rating comment {} by user {}: {}", commentId, userId, e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to rate comment");
+        }
         return ResponseEntity.ok(response);
     }
 }

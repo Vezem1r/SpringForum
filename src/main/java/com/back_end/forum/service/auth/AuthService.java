@@ -8,6 +8,7 @@ import com.back_end.forum.model.User;
 import com.back_end.forum.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +23,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -32,15 +34,18 @@ public class AuthService {
 
     private final EmailService emailService;
 
-    public User signup(RegisterUserDto registerUserDto){
+    public User signup(RegisterUserDto registerUserDto) {
+        log.info("Attempting to sign up user: {}", registerUserDto.getUsername());
 
         Optional<User> existingUserByUsername = userRepository.findByUsername(registerUserDto.getUsername());
         if (existingUserByUsername.isPresent()) {
             User userByUsername = existingUserByUsername.get();
             if (userByUsername.isEnabled()) {
+                log.error("User with username '{}' already exists.", registerUserDto.getUsername());
                 throw new BadRequest("User with this username already exists.");
             } else {
                 userRepository.delete(userByUsername);
+                log.info("Deleted disabled user with username: {}", registerUserDto.getUsername());
             }
         }
 
@@ -48,9 +53,11 @@ public class AuthService {
         if (existingUserByEmail.isPresent()) {
             User userByEmail = existingUserByEmail.get();
             if (userByEmail.isEnabled()) {
+                log.error("User with email '{}' already exists.", registerUserDto.getEmail());
                 throw new BadRequest("User with this email already exists.");
             } else {
                 userRepository.delete(userByEmail);
+                log.info("Deleted disabled user with email: {}", registerUserDto.getEmail());
             }
         }
 
@@ -64,73 +71,85 @@ public class AuthService {
         user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
         sendVerificationEmail(user);
+        log.info("User signed up successfully: {}", registerUserDto.getUsername());
         return userRepository.save(user);
     }
 
-    public User authenticate(LoginUserDto loginUserDto){
+    public User authenticate(LoginUserDto loginUserDto) {
         String usernameOrEmail = loginUserDto.getUsernameOrEmail();
-        System.out.println("Received login request: " + loginUserDto);
-        System.out.println("Attempting to authenticate user: " + usernameOrEmail);
+        log.info("Received login request for: {}", usernameOrEmail);
+
         Optional<User> optionalUser;
 
         if (usernameOrEmail.contains("@")) {
-            System.out.println("Loading user by email: " + usernameOrEmail);
+            log.info("Loading user by email: {}", usernameOrEmail);
             optionalUser = userRepository.findByEmail(usernameOrEmail);
         } else {
-            System.out.println("Loading user by username: " + usernameOrEmail);
+            log.info("Loading user by username: {}", usernameOrEmail);
             optionalUser = userRepository.findByUsername(usernameOrEmail);
         }
 
         if (optionalUser.isEmpty()) {
-            System.out.println("User not found: " + usernameOrEmail);
+            log.error("User not found: {}", usernameOrEmail);
             throw new UsernameNotFoundException("User not found " + usernameOrEmail);
         }
 
         User user = optionalUser.get();
 
-        if (!user.isEnabled()){
+        if (!user.isEnabled()) {
+            log.warn("Account not verified for user: {}", usernameOrEmail);
             throw new RuntimeException("Account not verified");
         }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         usernameOrEmail,
                         loginUserDto.getPassword()
                 )
         );
+        log.info("User authenticated successfully: {}", usernameOrEmail);
         return user;
     }
-    public void verifyUser(VerifyUserDto verifyUserDto){
+
+    public void verifyUser(VerifyUserDto verifyUserDto) {
         Optional<User> optionalUser = userRepository.findByEmail(verifyUserDto.getEmail());
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            if (user.getVerificationCodeExpiredAt().isBefore(LocalDateTime.now())){
+            if (user.getVerificationCodeExpiredAt().isBefore(LocalDateTime.now())) {
+                log.error("Verification code has expired for user: {}", verifyUserDto.getEmail());
                 throw new RuntimeException("Verification code has expired");
             }
-            if (user.getVerificationCode().equals(verifyUserDto.getVerificationCode())){
+            if (user.getVerificationCode().equals(verifyUserDto.getVerificationCode())) {
                 user.setEnabled(true);
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiredAt(null);
                 userRepository.save(user);
+                log.info("User verified successfully: {}", verifyUserDto.getEmail());
             } else {
+                log.error("Invalid verification code for user: {}", verifyUserDto.getEmail());
                 throw new RuntimeException("Invalid verification code");
             }
         } else {
+            log.error("User not found for verification: {}", verifyUserDto.getEmail());
             throw new RuntimeException("User not found");
         }
     }
 
-    public void resendVerificationCode(String email){
+    public void resendVerificationCode(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        if(optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.isEnabled()) {
+                log.warn("Account is already verified for user: {}", email);
                 throw new RuntimeException("Account is already verified");
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(5));
             sendVerificationEmail(user);
             userRepository.save(user);
+            log.info("Resent verification code to user: {}", email);
         } else {
+            log.error("User not found for resending verification code: {}", email);
             throw new RuntimeException("User not found");
         }
     }
@@ -140,7 +159,6 @@ public class AuthService {
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
     }
-
     private void sendVerificationEmail(User user) {
         String subject = "Account Verification";
         String verificationCode = "VERIFICATION CODE " + user.getVerificationCode();
@@ -172,8 +190,9 @@ public class AuthService {
                 + "</html>";
         try {
             emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
+            log.info("Verification email sent to: {}", user.getEmail());
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.error("Failed to send verification email to: {}", user.getEmail(), e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.back_end.forum.config;
 
+import com.back_end.forum.controller.UserController;
 import com.back_end.forum.service.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +20,11 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
+import static com.back_end.forum.controller.UserController.blacklistedTokens;
+
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final HandlerExceptionResolver handlerExceptionResolver;
@@ -39,35 +44,43 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String userEmail;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("Authorization header is missing or invalid.");
+            log.warn("Authorization header is missing or invalid.");
             filterChain.doFilter(request, response);
             return;
         }
+
         try {
             jwt = authHeader.substring(7);
-            System.out.println("Extracted JWT: " + jwt);
+            log.info("Extracted JWT: {}", jwt);
             userEmail = jwtService.extractUsername(jwt);
-            System.out.println("Extracted user: " + userEmail);
+            log.info("Extracted user: {}", userEmail);
+
+            if (UserController.getBlacklistedTokens().contains(jwt)) {
+                log.warn("Token is invalid and is blacklisted.");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid");
+                return;
+            }
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                System.out.println("Loaded UserDetails: " + userDetails);
+                log.info("Loaded UserDetails: {}", userDetails);
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    System.out.println("Authentication set in SecurityContext.");
+                    log.info("Authentication set in SecurityContext.");
                 } else {
-                    System.out.println("JWT is invalid.");
+                    log.warn("JWT is invalid.");
                 }
             } else {
-                System.out.println("User not found or already authenticated.");
+                log.warn("User not found or already authenticated.");
             }
 
             filterChain.doFilter(request, response);
         } catch (Exception exception){
+            log.error("Exception occurred during JWT authentication: {}", exception.getMessage());
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }

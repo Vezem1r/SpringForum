@@ -11,15 +11,19 @@ import com.back_end.forum.service.UserService;
 import com.back_end.forum.service.auth.AuthService;
 import com.back_end.forum.service.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @RequestMapping("/auth")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final JwtService jwtService;
@@ -29,13 +33,16 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<User> signup(@RequestBody RegisterUserDto registerUserDto){
+        log.info("Received register request: {}", registerUserDto);
+
         User registeredUser = authService.signup(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/signin")
     public ResponseEntity<LoginResponse> signin(@RequestBody LoginUserDto loginUserDto){
-        System.out.println("Received login request: " + loginUserDto);
+        log.info("Received login request: {}", loginUserDto);
+
         User authenticatedUser = authService.authenticate(loginUserDto);
         authenticatedUser.setLastLogin(LocalDateTime.now());
         userRepository.save(authenticatedUser);
@@ -50,6 +57,7 @@ public class AuthController {
             authService.verifyUser(verifyUserDto);
             return ResponseEntity.ok(Map.of("message", "Account verified successfully")); // Return as JSON
         } catch (RuntimeException err) {
+            log.error("Verification error: {}", err.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", err.getMessage()));
         }
     }
@@ -71,6 +79,7 @@ public class AuthController {
             userService.initiatePasswordResetByEmail(email);
             return ResponseEntity.ok("Password reset code has been sent to your email.");
         } catch (RuntimeException e) {
+            log.error("Error sending verification code: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

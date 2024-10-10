@@ -10,13 +10,13 @@ import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.responses.AttachmentResponse;
 import com.back_end.forum.responses.CommentResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.Console;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -36,17 +37,23 @@ public class CommentService {
     private final NotificationService notificationService;
 
     public Comment addComment(CommentDto commentDto, String username) throws IOException {
+        log.info("Adding comment for topic id: {}", commentDto.getTopicId());
         Comment comment = new Comment();
         comment.setContent(commentDto.getContent());
         comment.setCreatedAt(LocalDateTime.now());
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new RuntimeException("User not found");
+                });
 
         comment.setUser(user);
         Topic topic = topicRepository.findById(commentDto.getTopicId())
-                .orElseThrow(() -> new RuntimeException("Topic not found"));
-
+                .orElseThrow(() -> {
+                    log.error("Topic not found with id: {}", commentDto.getTopicId());
+                    return new RuntimeException("Topic not found");
+                });
         topic.setUpdatedAt(LocalDateTime.now());
         topicRepository.save(topic);
         comment.setTopic(topic);
@@ -67,6 +74,7 @@ public class CommentService {
         if (commentDto.getAttachments() != null) {
             for (MultipartFile attachmentFile : commentDto.getAttachments()) {
                 if (attachmentFile != null && !attachmentFile.isEmpty()) {
+                    log.info("Saving attachment for comment id: {}", savedComment.getCommentId());
                     Attachment attachment = attachmentService.saveAttachment(attachmentFile);
                     if (attachment != null) {
                         attachment.setComment(savedComment);
@@ -80,11 +88,16 @@ public class CommentService {
     }
 
     private Comment findCommentById(Long id) {
+        log.info("Finding comment by id: {}", id);
         return commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> {
+                    log.error("Comment not found with id: {}", id);
+                    return new RuntimeException("Comment not found");
+                });
     }
 
     public Page<CommentResponse> getCommentReplies(Long parentId, Pageable pageable) {
+        log.info("Fetching replies for comment id: {}", parentId);
         Page<Comment> parentComments = commentRepository.findByParentComment_CommentId(parentId, pageable);
         return parentComments.map(comment -> {
             CommentResponse dto = new CommentResponse(
@@ -110,6 +123,7 @@ public class CommentService {
     }
 
     private List<AttachmentResponse> loadAttachmentsForComment(Comment comment) {
+        log.info("Loading attachments for comment id: {}", comment.getCommentId());
         return comment.getAttachments().stream()
                 .map(attachment -> new AttachmentResponse(
                         attachment.getId(),
@@ -120,6 +134,7 @@ public class CommentService {
     }
 
     private List<CommentResponse> loadChildReplies(Long parentId) {
+        log.info("Loading child replies for comment id: {}", parentId);
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
         List<Comment> replies = commentRepository.findByParentComment_CommentId(parentId, pageable).getContent();
 
@@ -147,6 +162,7 @@ public class CommentService {
     }
 
     public Integer getCommentRating(Long commentId) {
+        log.info("Getting rating for comment id: {}", commentId);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
         return comment.getRating();

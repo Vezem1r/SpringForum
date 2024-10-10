@@ -2,6 +2,7 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.model.Attachment;
 import com.back_end.forum.repository.AttachmentRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
@@ -27,13 +29,20 @@ public class AttachmentService {
         String originalFilename = attachmentFile.getOriginalFilename();
         String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
         Path uploadPath = Paths.get(UPLOAD_DIR, uniqueFilename);
+
+        log.info("Saving attachment: {} to path: {}", originalFilename, uploadPath);
+
         Files.write(uploadPath, attachmentFile.getBytes());
+
         Attachment attachment = new Attachment();
         attachment.setFilename(originalFilename);
         attachment.setSize(attachmentFile.getSize());
         attachment.setContentType(attachmentFile.getContentType());
         attachment.setFilePath(uploadPath.toString());
         attachment.setCreatedAt(LocalDateTime.now());
+
+        log.info("Attachment saved successfully: {}", attachment);
+
         return attachmentRepository.save(attachment);
     }
 

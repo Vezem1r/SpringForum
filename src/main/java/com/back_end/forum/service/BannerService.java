@@ -3,6 +3,7 @@ package com.back_end.forum.service;
 import com.back_end.forum.model.Banner;
 import com.back_end.forum.repository.BannerRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BannerService {
 
     private BannerRepository bannerRepository;
@@ -24,13 +26,20 @@ public class BannerService {
         String originalFilename = bannerFile.getOriginalFilename();
         String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
         Path uploadPath = Paths.get(BANNER_DIR, uniqueFilename);
+
+        log.info("Saving banner: {} to path: {}", originalFilename, uploadPath);
+
         Files.write(uploadPath, bannerFile.getBytes());
+
         Banner banner = new Banner();
         banner.setFilename(originalFilename);
         banner.setSize(bannerFile.getSize());
         banner.setContentType(bannerFile.getContentType());
         banner.setFilePath(uploadPath.toString());
         banner.setCreatedAt(LocalDateTime.now());
+
+        log.info("Banner saved successfully: {}", banner);
+
         return bannerRepository.save(banner);
     }
 }

@@ -5,9 +5,7 @@ It supports features such as user authentication, real-time communication using 
 Additionally, the application utilizes **SMTP** for sending emails, providing users with essential email verification.
 
 - [ ] Add private chat using websocket
-- [ ] Add private notifications using websocket
 - [ ] Add Admin and guest roles with their functionality
-- [ ] Add logger
 - [ ] Add docker composer
 - [ ] Deploy
 
@@ -35,7 +33,7 @@ This forum application includes various roles, each with different permissions:
   - 👤 Has a personal profile displaying their personal information (email is hidden to other users), topics, and overall rating.
   - ✏️ Can change their username, avatar, and password with email verification.
   - 📩 ~~Can send messages to different users and receive messages.~~
-  - 🔔 ~~Has personal notifications for:~~
+  - 🔔 Has personal notifications for:
     - 🆕 New comments on their topics.
     - 📊 Changes in the rating of their topics or comments.
     - ✉️ Personal messages.
@@ -58,6 +56,9 @@ This project is built with the following technologies:
   - 🗄️ MariaDB (as the database)
   - 🔑 JWT for authentication
   - 🛠️ Lombok (for reducing boilerplate code)
+  - 📄 Swagger (for API documentation)
+  - 📜 Logback (for logging)
+  
 
 - **Frontend**:
   - ⚛️ React

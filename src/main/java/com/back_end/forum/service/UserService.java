@@ -10,6 +10,7 @@ import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.service.auth.EmailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,31 +26,35 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final CommentRepository commentRepository;
-
     private final TopicRepository topicRepository;
-
     private final EmailService emailService;
-
     private final PasswordEncoder passwordEncoder;
 
     private final String UPLOAD_DIR = "src/main/resources/static/avatars";
 
     public List<User> allUsers(){
+        log.info("Fetching all users");
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(users::add);
+        log.info("Number of users retrieved: {}", users.size());
         return users;
     }
 
     public UserProfileDto getProfileByUsername(String username){
+        log.info("Fetching profile for user: {}", username);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new RuntimeException("User not found");
+                });
 
         UserProfileDto profileDto = new UserProfileDto();
+
         profileDto.setUserId(user.getUserId());
         profileDto.setUsername(user.getUsername());
         profileDto.setCreatedAt(user.getCreatedAt());
@@ -75,15 +80,24 @@ public class UserService {
 
         profileDto.setRating(totalRating);
 
+        log.info("Profile fetched for user: {}, Comment Count: {}, Topic Count: {}, Total Rating: {}",
+                username, commentCount, topicCount, totalRating);
+
         return profileDto;
     }
 
     public String uploadAvatar(Long userId, MultipartFile file) throws IOException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("Uploading avatar for userId: {}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", userId);
+                    return new RuntimeException("User not found");
+                });
 
         if(user.getProfilePicture() != null){
             Path oldAvatarPath = Paths.get(UPLOAD_DIR).resolve(user.getProfilePicture());
             Files.deleteIfExists(oldAvatarPath);
+            log.info("Deleted old avatar: {}", user.getProfilePicture());
         }
 
         String avatarFileName = "avatar_" + userId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
@@ -92,14 +106,19 @@ public class UserService {
 
         user.setProfilePicture(avatarFileName);
         userRepository.save(user);
+        log.info("Uploaded new avatar: {}", avatarFileName);
 
         return avatarFileName;
     }
 
 
     public void initiatePasswordResetByEmail(String email) {
+        log.info("Initiating password reset for email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User with this email not found"));
+                .orElseThrow(() -> {
+                    log.error("User with this email not found: {}", email);
+                    return new RuntimeException("User with this email not found");
+                });
 
         String resetCode = generateResetCode();
         user.setPasswordResetCode(resetCode);
@@ -110,21 +129,28 @@ public class UserService {
         String text = "Your password reset code is: " + resetCode;
         try {
             emailService.sendVerificationEmail(user.getEmail(), subject, text);
+            log.info("Password reset email sent to: {}", user.getEmail());
         } catch (MessagingException e) {
-            System.out.println("Failed to send email: " + e.getMessage());
+            log.error("Failed to send email to {}: {}", user.getEmail(), e.getMessage());
             throw new RuntimeException("Failed to send password reset email", e);
         }
     }
 
     public void resetPassword(Long userId, String resetCode, String newPassword){
+        log.info("Resetting password for userId: {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", userId);
+                    return new RuntimeException("User not found");
+                });
 
         if (user.getPasswordResetCodeExpiredAt().isBefore(LocalDateTime.now())) {
+            log.error("Reset code has expired for userId: {}", userId);
             throw new RuntimeException("Reset code has expired");
         }
 
         if (!user.getPasswordResetCode().equals(resetCode)) {
+            log.error("Invalid reset code for userId: {}. Provided: {}", userId, resetCode);
             throw new RuntimeException("Invalid reset code");
         }
 
@@ -132,6 +158,8 @@ public class UserService {
         user.setPasswordResetCode(null);
         user.setPasswordResetCodeExpiredAt(null);
         userRepository.save(user);
+        log.info("Password reset successful for userId: {}", userId);
+
     }
 
     private String generateResetCode() {
@@ -143,21 +171,33 @@ public class UserService {
             resetCode = String.valueOf(code);
         } while (userRepository.existsByPasswordResetCode(resetCode));
 
+        log.info("Generated reset code: {}", resetCode);
         return resetCode;
     }
 
     public boolean changeUsername(Long userId, String newUsername) {
+        log.info("Changing username for userId: {} to {}", userId, newUsername);
         if (userRepository.existsByUsername(newUsername)) {
+            log.error("Username already exists: {}", newUsername);
             return false;
         }
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", userId);
+                    return new RuntimeException("User not found");
+                });
         user.setUsername(newUsername);
         userRepository.save(user);
+        log.info("Username changed successfully for userId: {}", userId);
         return true;
     }
 
-    public User findByUsername(String username){
+    public User findByUsername(String username) {
+        log.info("Finding user by username: {}", username);
         return userRepository.findByUsername(username)
-                .orElseThrow(()->new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username);
+                    return new IllegalArgumentException("User not found");
+                });
     }
 }
