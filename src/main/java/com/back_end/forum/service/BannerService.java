@@ -2,7 +2,7 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.model.Banner;
 import com.back_end.forum.repository.BannerRepository;
-import lombok.AllArgsConstructor;
+import com.back_end.forum.utils.FolderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,16 +15,22 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class BannerService {
 
-    private BannerRepository bannerRepository;
+    private final BannerRepository bannerRepository;
 
-    private static final String BANNER_DIR = "src/main/resources/static/banners";
+    private static final String BANNER_DIR = "static/banners";
+
+    public BannerService(BannerRepository bannerRepository) {
+        this.bannerRepository = bannerRepository;
+
+        FolderUtils.createDirectories(BANNER_DIR);
+    }
+
     public Banner saveBanner(MultipartFile bannerFile) throws IOException {
         String originalFilename = bannerFile.getOriginalFilename();
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+        String uniqueFilename = UUID.randomUUID() + "_" + originalFilename;
         Path uploadPath = Paths.get(BANNER_DIR, uniqueFilename);
 
         log.info("Saving banner: {} to path: {}", originalFilename, uploadPath);

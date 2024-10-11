@@ -2,6 +2,7 @@ package com.back_end.forum.service;
 
 import com.back_end.forum.model.Attachment;
 import com.back_end.forum.repository.AttachmentRepository;
+import com.back_end.forum.utils.FolderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
@@ -17,17 +18,22 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
 
-    private final String UPLOAD_DIR = "src/main/resources/static/uploads";
+    private final static String UPLOAD_DIR = "static/uploads";
+
+    public AttachmentService(AttachmentRepository attachmentRepository) {
+        this.attachmentRepository = attachmentRepository;
+
+        FolderUtils.createDirectories(UPLOAD_DIR);
+    }
 
     public Attachment saveAttachment(MultipartFile attachmentFile) throws IOException {
         String originalFilename = attachmentFile.getOriginalFilename();
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+        String uniqueFilename = UUID.randomUUID() + "_" + originalFilename;
         Path uploadPath = Paths.get(UPLOAD_DIR, uniqueFilename);
 
         log.info("Saving attachment: {} to path: {}", originalFilename, uploadPath);
