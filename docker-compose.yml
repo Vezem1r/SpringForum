@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb_container
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MARIADB_DATABASE: ${SPRING_DATASOURCE_DB}
+      MARIADB_USER: ${SPRING_DATASOURCE_USERNAME}
+      MARIADB_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  db:
+    driver: local
