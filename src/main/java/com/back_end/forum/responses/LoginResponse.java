@@ -11,8 +11,6 @@ public class LoginResponse {
     private String message;
 
     public LoginResponse(String token, String message) {
-        this.token = token;
-        this.expiredIn = 0;
-        this.message = message;
+        this(token, 0, message);
     }
 }

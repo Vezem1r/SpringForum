@@ -71,6 +71,7 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
+        // TODO: Disintegrate spaghetti code
         if (commentDto.getAttachments() != null) {
             for (MultipartFile attachmentFile : commentDto.getAttachments()) {
                 if (attachmentFile != null && !attachmentFile.isEmpty()) {

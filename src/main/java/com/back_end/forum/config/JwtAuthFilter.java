@@ -75,7 +75,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     log.warn("JWT is invalid.");
                 }
             } else {
-                log.warn("User not found or already authenticated.");
+                log.error("User not found or already authenticated.");
             }
 
             filterChain.doFilter(request, response);

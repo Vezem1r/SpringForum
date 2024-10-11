@@ -113,25 +113,25 @@ public class AuthService {
 
     public void verifyUser(VerifyUserDto verifyUserDto) {
         Optional<User> optionalUser = userRepository.findByEmail(verifyUserDto.getEmail());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.getVerificationCodeExpiredAt().isBefore(LocalDateTime.now())) {
-                log.error("Verification code has expired for user: {}", verifyUserDto.getEmail());
-                throw new RuntimeException("Verification code has expired");
-            }
-            if (user.getVerificationCode().equals(verifyUserDto.getVerificationCode())) {
-                user.setEnabled(true);
-                user.setVerificationCode(null);
-                user.setVerificationCodeExpiredAt(null);
-                userRepository.save(user);
-                log.info("User verified successfully: {}", verifyUserDto.getEmail());
-            } else {
-                log.error("Invalid verification code for user: {}", verifyUserDto.getEmail());
-                throw new RuntimeException("Invalid verification code");
-            }
-        } else {
+        if (optionalUser.isEmpty()) {
             log.error("User not found for verification: {}", verifyUserDto.getEmail());
             throw new RuntimeException("User not found");
+        }
+
+        User user = optionalUser.get();
+        if (user.getVerificationCodeExpiredAt().isBefore(LocalDateTime.now())) {
+            log.error("Verification code has expired for user: {}", verifyUserDto.getEmail());
+            throw new RuntimeException("Verification code has expired");
+        }
+        if (user.getVerificationCode().equals(verifyUserDto.getVerificationCode())) {
+            user.setEnabled(true);
+            user.setVerificationCode(null);
+            user.setVerificationCodeExpiredAt(null);
+            userRepository.save(user);
+            log.info("User verified successfully: {}", verifyUserDto.getEmail());
+        } else {
+            log.error("Invalid verification code for user: {}", verifyUserDto.getEmail());
+            throw new RuntimeException("Invalid verification code");
         }
     }
 

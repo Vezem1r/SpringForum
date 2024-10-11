@@ -30,6 +30,7 @@ public class UserController {
     @Getter
     public static final Set<String> blacklistedTokens = new HashSet<>();
 
+    // TODO: Remove endpoint
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         if (token.startsWith("Bearer ")) {

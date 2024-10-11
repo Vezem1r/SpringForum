@@ -94,7 +94,7 @@ public class TopicService {
                 topic.getUser().getUsername(),
                 topic.getCategory().getName(),
                 topic.getTags().stream()
-                        .map(tag -> tag.getName())
+                        .map(Tag::getName)
                         .collect(Collectors.toList()),
                 topic.getRating()
         ));
@@ -186,7 +186,7 @@ public class TopicService {
                 topic.getUpdatedAt(),
                 topic.getUser().getUsername(),
                 topic.getCategory().getName(),
-                topic.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toList()),
+                topic.getTags().stream().map(Tag::getName).collect(Collectors.toList()),
                 topic.getRating(),
                 bannerUrl,
                 attachmentResponses,
