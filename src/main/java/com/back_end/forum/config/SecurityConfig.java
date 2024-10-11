@@ -34,7 +34,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/homepage/**",
                                 "/topicpage/**",
-                                "/profilepage/**")
+                                "/profilepage/**",
+                                "/connect",
+                                "/message/**")
                         .permitAll()
                         .requestMatchers(
                                 "/avatars/**",
