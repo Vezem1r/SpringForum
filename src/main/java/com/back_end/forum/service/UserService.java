@@ -8,6 +8,7 @@ import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.service.auth.EmailService;
+import com.back_end.forum.utils.FolderUtils;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
@@ -35,7 +35,22 @@ public class UserService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
-    private final String UPLOAD_DIR = "src/main/resources/static/avatars";
+    private final static String UPLOAD_DIR = "static/avatars";
+
+    public UserService(
+            UserRepository userRepository,
+            CommentRepository commentRepository,
+            TopicRepository topicRepository,
+            EmailService emailService,
+            PasswordEncoder passwordEncoder) {
+        this.userRepository  = userRepository;
+        this.commentRepository = commentRepository;
+        this.topicRepository = topicRepository;
+        this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
+
+        FolderUtils.createDirectories(UPLOAD_DIR);
+    }
 
     public List<User> allUsers(){
         log.info("Fetching all users");
