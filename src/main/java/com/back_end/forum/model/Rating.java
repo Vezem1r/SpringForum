@@ -28,7 +28,7 @@ public class Rating {
     private Comment comment;
 
     @Column(nullable = false)
-    private Integer value; // -1 для downvote, +1 для upvote
+    private Integer value; // Decrement for downvote, increment for upvote
 
     public Rating(User user, Topic topic, Comment comment, Integer value) {
         this.user = user;

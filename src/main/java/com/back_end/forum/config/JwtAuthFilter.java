@@ -1,6 +1,5 @@
 package com.back_end.forum.config;
 
-import com.back_end.forum.controller.UserController;
 import com.back_end.forum.service.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,8 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-
-import static com.back_end.forum.controller.UserController.blacklistedTokens;
 
 @Component
 @RequiredArgsConstructor
@@ -55,12 +52,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             userEmail = jwtService.extractUsername(jwt);
             log.info("Extracted user: {}", userEmail);
 
-            if (UserController.getBlacklistedTokens().contains(jwt)) {
-                log.warn("Token is invalid and is blacklisted.");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid");
-                return;
-            }
-
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                 log.info("Loaded UserDetails: {}", userDetails);
@@ -75,7 +66,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     log.warn("JWT is invalid.");
                 }
             } else {
-                log.warn("User not found or already authenticated.");
+                log.error("User not found or already authenticated.");
             }
 
             filterChain.doFilter(request, response);

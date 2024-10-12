@@ -6,7 +6,6 @@ Additionally, the application utilizes **SMTP** for sending emails, providing us
 
 - [ ] Add private chat using websocket
 - [ ] Add Admin and guest roles with their functionality
-- [ ] Add docker composer
 - [ ] Deploy
 
 ![Forum fast :) preview](src/main/resources/preview.gif)
@@ -15,6 +14,12 @@ Additionally, the application utilizes **SMTP** for sending emails, providing us
 
 ## Frontend Repository
 Find the frontend part of this project [here](https://github.com/Vezem1r/SpringForumFrontend).
+
+---
+
+## How to Build the Project
+
+To set up and run the backend project locally, follow steps from our [wiki](https://github.com/Vezem1r/SpringForum/wiki/Build-and-Environment-Configuration-Guide).
 
 ---
 
@@ -66,13 +71,3 @@ This project is built with the following technologies:
   - 🌐 WebSocket
   - 🍞 React Toastify
   - 📦 React Icons
-
----
-
-## How to Build the Project
-
-To set up and run the backend project locally, follow these steps:
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Vezem1r/SpringForum.git

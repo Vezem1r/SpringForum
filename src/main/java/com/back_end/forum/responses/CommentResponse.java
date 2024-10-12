@@ -21,11 +21,11 @@ public class CommentResponse {
     private List<CommentResponse> replies;
     private List<AttachmentResponse> attachments;
 
-    public List<CommentResponse> getReplies() {
-        return replies;
-    }
-
-    public void setReplies(List<CommentResponse> replies) {
-        this.replies = replies;
-    }
+//    public List<CommentResponse> getReplies() {
+//        return replies;
+//    }
+//
+//    public void setReplies(List<CommentResponse> replies) {
+//        this.replies = replies;
+//    }
 }

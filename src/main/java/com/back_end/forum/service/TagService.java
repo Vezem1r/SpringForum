@@ -53,9 +53,7 @@ public class TagService {
                 newTag.setName(tagName);
                 return tagRepository.save(newTag);
             });
-            if (!tags.contains(tag)) {
-                tags.add(tag);
-            }
+            tags.add(tag);
         }
         log.info("Retrieved or created tags: {}", tags);
         return tags;

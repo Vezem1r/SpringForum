@@ -27,24 +27,6 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
 
-    @Getter
-    public static final Set<String> blacklistedTokens = new HashSet<>();
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            String jwtToken = token.substring(7);
-
-            log.info("User is logging out. Token: {}", jwtToken);
-
-            blacklistedTokens.add(jwtToken);
-            log.info("Token added to blacklist successfully: {}", jwtToken);
-            return ResponseEntity.ok("Logout successful");
-        }
-        log.warn("Invalid token provided for logout: {}", token);
-        return ResponseEntity.badRequest().body("Invalid token");
-    }
-
     @PostMapping("/upload-avatar")
     public ResponseEntity<String> uploadAvatar(@RequestParam("avatar") MultipartFile avatar) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

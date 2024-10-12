@@ -71,19 +71,24 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        if (commentDto.getAttachments() != null) {
-            for (MultipartFile attachmentFile : commentDto.getAttachments()) {
-                if (attachmentFile != null && !attachmentFile.isEmpty()) {
-                    log.info("Saving attachment for comment id: {}", savedComment.getCommentId());
-                    Attachment attachment = attachmentService.saveAttachment(attachmentFile);
-                    if (attachment != null) {
-                        attachment.setComment(savedComment);
-                        attachmentRepository.save(attachment);
-                        comment.addAttachment(attachment);
-                    }
+        List<MultipartFile> attachments = commentDto.getAttachments();
+
+        if (attachments != null) {
+            for (MultipartFile attachmentFile : attachments) {
+                if (attachmentFile == null && attachmentFile.isEmpty()) {
+                    continue;
                 }
+                log.info("Saving attachment for comment id: {}", savedComment.getCommentId());
+                Attachment attachment = attachmentService.saveAttachment(attachmentFile);
+                if (attachment == null) {
+                    continue;
+                }
+                attachment.setComment(savedComment);
+                attachmentRepository.save(attachment);
+                comment.addAttachment(attachment);
             }
         }
+
         return savedComment;
     }
 

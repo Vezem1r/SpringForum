@@ -34,5 +34,6 @@ build/
 
 ### VS Code ###
 .vscode/
-static
 
+static
+logs
