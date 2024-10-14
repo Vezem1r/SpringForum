@@ -1,10 +1,12 @@
 package com.back_end.forum.config;
 
+import com.back_end.forum.model.enums.RolesEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,11 +20,39 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${cors.allowed.origins}")
     private String allowedOrigins;
+
+    private final String[] WHITE_LIST_SWAGGER = {
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-ui.html"
+    };
+
+    private final String[] WHITE_LIST = {
+            "/auth/**",
+            "/homepage/**",
+            "/topicpage/**",
+            "/profilepage/**",
+            "/avatars/**",
+            "/banners/**",
+            "/uploads/**",
+
+
+            "/connect",
+            "/message/**"
+    };
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthFilter jwtAuthFilter;
@@ -31,20 +61,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(
-                                "/homepage/**",
-                                "/topicpage/**",
-                                "/profilepage/**",
-                                "/connect",
-                                "/message/**")
-                        .permitAll()
-                        .requestMatchers(
-                                "/avatars/**",
-                                "/banners/**",
-                                "/uploads/**")
-                        .permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui**/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .requestMatchers(WHITE_LIST).permitAll()
+                        .requestMatchers(WHITE_LIST_SWAGGER).permitAll()
+                        .requestMatchers("/admin/**").hasAnyRole(RolesEnum.ADMIN.name())
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

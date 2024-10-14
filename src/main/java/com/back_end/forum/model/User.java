@@ -1,5 +1,6 @@
 package com.back_end.forum.model;
 
+import com.back_end.forum.model.enums.RolesEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -37,6 +38,9 @@ public class User implements UserDetails {
     @Column
     private String profilePicture;
 
+    @Enumerated
+    private RolesEnum role;
+
     /*-----------------------------------------------------*/
 
     @JsonIgnore
@@ -62,10 +66,9 @@ public class User implements UserDetails {
 
     /*-----------------------------------------------------*/
 
-    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return role.getAuthorities();
     }
 
     @JsonIgnore

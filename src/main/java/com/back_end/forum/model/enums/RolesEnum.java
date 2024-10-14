@@ -1,6 +1,7 @@
 package com.back_end.forum.model.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
@@ -12,6 +13,7 @@ import static com.back_end.forum.model.enums.Permission.*;
 
 
 @RequiredArgsConstructor
+@Slf4j
 public enum RolesEnum {
     ADMIN(
             Set.of(
@@ -19,31 +21,32 @@ public enum RolesEnum {
                     ADMIN_CREATE,
                     ADMIN_UPDATE,
                     ADMIN_DELETE,
-                    MODERATOR_READ,
-                    MODERATOR_CREATE,
-                    MODERATOR_UPDATE,
-                    MODERATOR_DELETE
+                    USER_READ,
+                    USER_CREATE,
+                    USER_UPDATE,
+                    USER_DELETE
             )
     ),
-    MODERATOR(
+    USER(
             Set.of(
-                    MODERATOR_READ,
-                    MODERATOR_CREATE,
-                    MODERATOR_UPDATE,
-                    MODERATOR_DELETE
+                    USER_READ,
+                    USER_CREATE,
+                    USER_UPDATE,
+                    USER_DELETE
             )
     ),
-    USER(Collections.emptySet())
+    GUEST(Collections.emptySet())
     ;
 
     @Getter
     private final Set<Permission> persmission;
 
     public List<SimpleGrantedAuthority> getAuthorities(){
-        var authorities = getPersmission().stream()
+        var authorities = new java.util.ArrayList<>(getPersmission().stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.name()))
-                .toList();
+                .toList());
         authorities.add(new SimpleGrantedAuthority("ROLE_" +this.name()));
+        log.info("Authorities: {}", authorities);
         return authorities;
     }
 }

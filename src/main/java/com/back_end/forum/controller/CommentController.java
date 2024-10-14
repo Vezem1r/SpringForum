@@ -5,6 +5,7 @@ import com.back_end.forum.model.Comment;
 import com.back_end.forum.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +16,13 @@ import java.io.IOException;
 @RequestMapping("/comments")
 @RequiredArgsConstructor
 @Slf4j
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 public class CommentController {
 
     private final CommentService commentService;
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<Comment> createTopic(@ModelAttribute CommentDto commentDto) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

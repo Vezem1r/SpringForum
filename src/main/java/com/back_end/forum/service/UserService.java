@@ -4,6 +4,7 @@ import com.back_end.forum.dto.UserProfileDto;
 import com.back_end.forum.model.Comment;
 import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
+import com.back_end.forum.model.enums.RolesEnum;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
@@ -12,6 +13,7 @@ import com.back_end.forum.utils.FolderUtils;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +25,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -36,6 +39,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final static String UPLOAD_DIR = "static/avatars";
+
+    @Value("${admin.password}")
+    private String password;
 
     public UserService(
             UserRepository userRepository,
@@ -214,5 +220,28 @@ public class UserService {
                     log.error("User not found: {}", username);
                     return new IllegalArgumentException("User not found");
                 });
+    }
+
+    public User createGuest() { return createUser("Guest", RolesEnum.GUEST);}
+    public User createAdmin() { return createUser("Admin", RolesEnum.ADMIN);}
+
+    private User createUser(String name, RolesEnum role) {
+
+        Optional<User> existingOfUser = userRepository.findByUsername(name);
+
+        if(existingOfUser.isPresent()){
+            return  existingOfUser.get();
+        }
+
+        User user = new User();
+        user.setUsername(name);
+        user.setEmail(name + "_USER@forum.cz");
+        user.setPassword(passwordEncoder.encode(name + "_" + password));
+        user.setRole(role);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setLastLogin(LocalDateTime.now());
+        user.setEnabled(true);
+
+        return userRepository.save(user);
     }
 }

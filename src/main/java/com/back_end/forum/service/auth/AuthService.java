@@ -5,6 +5,7 @@ import com.back_end.forum.dto.Auth.RegisterUserDto;
 import com.back_end.forum.dto.Auth.VerifyUserDto;
 import com.back_end.forum.exception.BadRequest;
 import com.back_end.forum.model.User;
+import com.back_end.forum.model.enums.RolesEnum;
 import com.back_end.forum.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +71,7 @@ public class AuthService {
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
+        user.setRole(RolesEnum.USER);
         sendVerificationEmail(user);
         log.info("User signed up successfully: {}", registerUserDto.getUsername());
         return userRepository.save(user);
