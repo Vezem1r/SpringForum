@@ -41,11 +41,11 @@ public enum RolesEnum {
     @Getter
     private final Set<Permission> persmission;
 
-    public List<SimpleGrantedAuthority> getAuthorities(){
-        var authorities = new java.util.ArrayList<>(getPersmission().stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.name()))
-                .toList());
-        authorities.add(new SimpleGrantedAuthority("ROLE_" +this.name()));
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        var authorities = persmission.stream()
+                .map(p -> new SimpleGrantedAuthority(p.getPermission()))  // Use getPermission() to get correct strings
+                .collect(Collectors.toList());
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         log.info("Authorities: {}", authorities);
         return authorities;
     }

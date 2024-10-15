@@ -27,10 +27,10 @@ To set up and run the backend project locally, follow steps from our [wiki](http
 
 This forum application includes various roles, each with different permissions:
 
-- ~~**Admin**~~ (Not implemented yet)
+- **Admin**
   - 🛠️ Full access to the forum.
   - 👥 Can manage users, topics, comments, categories, and tags.
-
+  - 📊 Can view basic forum statistics.
 - **User**
   - 📝 Can create topics and comments with multipart attachments.
   - 💬 Can reply to comments.
@@ -43,10 +43,9 @@ This forum application includes various roles, each with different permissions:
     - 📊 Changes in the rating of their topics or comments.
     - ✉️ Personal messages.
 
-- ~~**Guest**~~ (Not implemented yet)
+- **Guest**
   - 👁️ Can view users' profiles, topics, and comments.
   - 🔍 Can search for topics based on various criteria.
-  - 🆕 Can log in or register with email verification.
   - 🚫 No permissions to interact with posts or comments.
 
 ---

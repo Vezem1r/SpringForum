@@ -4,6 +4,8 @@ import com.back_end.forum.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +19,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByPasswordResetCode(String passwordResetCode);
 
     boolean existsByPasswordResetCode(String passwordResetCode);
+
+    long countUserByLastLogin(LocalDateTime date);
 }
