@@ -5,6 +5,7 @@ import com.back_end.forum.service.RatingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class RatingController {
     private final RatingService ratingService;
 
     @PostMapping("/topic/{topicId}")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<String> rateTopic(@PathVariable Long topicId,
                                             @RequestParam int value) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -37,6 +39,7 @@ public class RatingController {
     }
 
     @PostMapping("/comment/{commentId}")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<String> rateComment(@PathVariable Long commentId,
                                               @RequestParam int value) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

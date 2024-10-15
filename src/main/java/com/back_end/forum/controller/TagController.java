@@ -6,6 +6,7 @@ import com.back_end.forum.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/tag")
@@ -17,6 +18,7 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<Tag> createTag(@RequestBody TagDto tagDto) {
         log.info("Creating a new tag with name: {}", tagDto.getName());
         Tag createdTag;

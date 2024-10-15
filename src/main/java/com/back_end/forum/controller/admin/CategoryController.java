@@ -30,7 +30,7 @@ public class CategoryController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id){
-        Category deletedCategory =  categoryService.deleteCategory(id);
+        categoryService.deleteCategory(id);
         return ResponseEntity.ok("Category has been removed");
     }
 

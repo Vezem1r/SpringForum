@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class TopicController {
     private final TopicService topicService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<Topic> createTopic(@ModelAttribute TopicDto topicDto) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

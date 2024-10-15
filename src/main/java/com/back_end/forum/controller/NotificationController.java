@@ -7,6 +7,7 @@ import com.back_end.forum.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -36,6 +37,7 @@ public class NotificationController {
     }
 
     @PostMapping("/{id}/mark-as-read")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<Void> markAsRead(@PathVariable Long id, Principal principal) {
         log.info("Marking notification {} as read for user: {}", id, principal.getName());
         User user = userRepository.findByUsername(principal.getName())
@@ -56,6 +58,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id, Principal principal) {
         log.info("Deleting notification {} for user: {}", id, principal.getName());
         User user = userRepository.findByUsername(principal.getName())
@@ -76,6 +79,7 @@ public class NotificationController {
     }
 
     @PostMapping("/mark-all-as-read")
+    @PreAuthorize("hasAuthority('user:create')")
     public ResponseEntity<Void> markAllAsRead(Principal principal) {
         log.info("Marking all notifications as read for user: {}", principal.getName());
         User user = userRepository.findByUsername(principal.getName())
@@ -89,6 +93,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/deleteAll")
+    @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<Void> deleteAllNotifications(Principal principal) {
         log.info("Deleting all notifications for user: {}", principal.getName());
         User user = userRepository.findByUsername(principal.getName())
