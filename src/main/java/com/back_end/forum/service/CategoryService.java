@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +66,47 @@ public class CategoryService {
     public List<Category> getAllCategories() {
         log.info("Fetching all categories");
         return categoryRepository.findAll();
+    }
+
+    public void createCategories(int amount) {
+
+        List<String> predefinedCategoryNames = List.of(
+                "Technology",
+                "Science",
+                "Movies",
+                "Music",
+                "Sports",
+                "Programming",
+                "Travel",
+                "Health",
+                "Education",
+                "Gaming"
+        );
+
+        log.info("Creating {} categories", amount);
+
+        if (amount > predefinedCategoryNames.size()) {
+            throw new IllegalArgumentException("Cannot create more than " + predefinedCategoryNames.size() + " categories");
+        }
+
+        Random random = new Random();
+
+        for (int i = 0; i < amount; i++) {
+            String categoryName = predefinedCategoryNames.get(random.nextInt(predefinedCategoryNames.size()));
+
+            if (categoryRepository.findByName(categoryName).isPresent()) {
+                log.info("Category with name '{}' already exists. Skipping.", categoryName);
+                continue;
+            }
+
+            String categoryDescription = "This category is about " + categoryName.toLowerCase() + " and related topics";
+
+            Category category = new Category();
+            category.setName(categoryName);
+            category.setDescription(categoryDescription);
+            categoryRepository.save(category);
+
+            log.info("Category created: {}", categoryName);
+        }
     }
 }

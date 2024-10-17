@@ -23,10 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -222,14 +219,21 @@ public class UserService {
                 });
     }
 
-    public User createGuest() { return createUser("Guest", RolesEnum.GUEST);}
-    public User createAdmin() { return createUser("Admin", RolesEnum.ADMIN);}
+    public User createGuest() {
+        log.info("Creating guest");
+        return createUser("Guest", RolesEnum.GUEST);
+    }
+    public User createAdmin() {
+        log.info("Creating admin");
+        return createUser("Admin", RolesEnum.ADMIN);
+    }
 
     private User createUser(String name, RolesEnum role) {
 
         Optional<User> existingOfUser = userRepository.findByUsername(name);
 
         if(existingOfUser.isPresent()){
+            log.error("Username already exists: {}", name);
             return  existingOfUser.get();
         }
 
@@ -242,6 +246,25 @@ public class UserService {
         user.setLastLogin(LocalDateTime.now());
         user.setEnabled(true);
 
+        log.info("Created user: {}", user);
+
         return userRepository.save(user);
+    }
+
+    public void createUsers(int amount) {
+        log.info("Creating {} random users", amount);
+
+        List<String> predefinedUsernames = Arrays.asList(
+                "CoolCat", "ThunderBolt", "MagicDragon", "Sunshine", "NightHawk",
+                "SuperStar", "SkyWalker", "PixelWizard", "FireFox", "OceanWave"
+        );
+
+        Random random = new Random();
+
+        for (int i = 0; i < amount; i++) {
+            String randomUsername = predefinedUsernames.get(random.nextInt(predefinedUsernames.size()));
+
+            createUser(randomUsername, RolesEnum.USER);
+        }
     }
 }

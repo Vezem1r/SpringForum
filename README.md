@@ -5,7 +5,6 @@ It supports features such as user authentication, real-time communication using 
 Additionally, the application utilizes **SMTP** for sending emails, providing users with essential email verification.
 
 - [ ] Add private chat using websocket
-- [ ] Add Admin and guest roles with their functionality
 - [ ] Deploy
 
 ![Forum fast :) preview](src/main/resources/preview.gif)

@@ -23,4 +23,17 @@ public class AdminController {
         AdminPageDto adminPageDto = adminService.getAdminPage();
         return ResponseEntity.ok(adminPageDto);
     }
+
+    //TODO Get all users
+
+    //TODO Edit user profile
+
+    //TODO Block user with time
+
+    //TODO Unblock user
+
+    //TODO Edit(with rating), delete, topic.
+
+    //TODO Edit(with rating), delete, comments.
+
 }
