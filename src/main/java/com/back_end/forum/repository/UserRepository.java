@@ -1,7 +1,9 @@
 package com.back_end.forum.repository;
 
 import com.back_end.forum.model.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,5 +22,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     boolean existsByPasswordResetCode(String passwordResetCode);
 
-    long countUserByLastLogin(LocalDateTime date);
+    @Query("SELECT COUNT(u) FROM User u WHERE u.lastLogin >= :todayStart")
+    long countUsersByLastLogin(@Param("todayStart") LocalDateTime todayStart);
+
 }

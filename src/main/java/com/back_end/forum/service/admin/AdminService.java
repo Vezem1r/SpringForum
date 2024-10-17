@@ -24,7 +24,7 @@ public class AdminService {
         LocalDateTime todayStart = getStartOfToday();
 
         long totalUsers = userRepository.count();
-        long loggedInTodayUsers = userRepository.countUserByLastLogin(todayStart);
+        long loggedInTodayUsers = userRepository.countUsersByLastLogin(todayStart);
 
         long totalTopics = topicRepository.count();
         long topicsCreatedToday = topicRepository.countTopicsByCreatedAt(todayStart);
