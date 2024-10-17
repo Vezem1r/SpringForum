@@ -23,10 +23,4 @@ public class AdminController {
         AdminPageDto adminPageDto = adminService.getAdminPage();
         return ResponseEntity.ok(adminPageDto);
     }
-
-    @DeleteMapping("/tag/delete/{id}")
-    public ResponseEntity<String> deleteTag(@PathVariable Long id) {
-        Tag deletedTag = tagService.deleteTag(id);
-        return ResponseEntity.ok("Tag has been removed");
-    }
 }

@@ -58,4 +58,25 @@ public class TagService {
         log.info("Retrieved or created tags: {}", tags);
         return tags;
     }
+
+    public Tag updateTag(Long id, TagDto tagDto) {
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Tag not found with id: {}", id);
+                    return new BadRequest("Tag not found with id " + id);
+                });
+        Optional<Tag> optionalTag = tagRepository.findByName(tagDto.getName());
+
+        if (optionalTag.isPresent()) {
+         log.warn("Attempted to update tag that already exists: {}", tagDto.getName());
+         throw new BadRequest("Tag already exists");
+        }
+        tag.setName(tagDto.getName());
+        return tagRepository.save(tag);
+    }
+
+    public List<Tag> getAllTags() {
+        log.info("Retrieving all tags");
+        return tagRepository.findAll();
+    }
 }
