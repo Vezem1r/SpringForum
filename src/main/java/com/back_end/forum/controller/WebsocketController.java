@@ -12,7 +12,7 @@ public class WebsocketController {
     @MessageMapping("/hello")
     @SendTo("/message/hello")
     public MessageDto hello(MessageDto message) {
-        log.info("MEssage accepted");
+        log.info("Message accepted");
         return new MessageDto("Hello world;" + message.getValue());
     }
 }

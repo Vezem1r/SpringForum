@@ -1,6 +1,7 @@
 package com.back_end.forum.controller.admin;
 
 import com.back_end.forum.dto.AdminPageDto;
+import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.service.UserService;
 import com.back_end.forum.service.admin.AdminService;
@@ -56,10 +57,50 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/topics/{topicId}")
+    @PreAuthorize("hasAuthority('admin:update')")
+    public ResponseEntity<?> updateTopic(
+            @PathVariable Long topicId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false) MultipartFile banner,
+            @RequestParam(required = false) Integer rating) {
+        try {
+            Topic updatedTopic = adminService.updateTopic(topicId, title, content, banner, rating);
+            log.info("Topic updated: {}", updatedTopic);
+            return ResponseEntity.ok(updatedTopic);
+        } catch (Exception e) {
+            log.error("Error updating topic: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while processing the request: " + e.getMessage());
+        }
+    }
 
+    @DeleteMapping("/topics/{topicId}")
+    @PreAuthorize("hasAuthority('admin:delete')")
+    public ResponseEntity<?> deleteTopic(@PathVariable Long topicId) {
+        try {
+            adminService.deleteTopic(topicId);
+            log.info("Topic deleted with id: {}", topicId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Error deleting topic: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while processing the request: " + e.getMessage());
+        }
+    }
 
-    //TODO Edit(with rating), delete, topic.
-
-    //TODO Edit(with rating), delete, comments.
-
+    @DeleteMapping("/comments/{commentId}")
+    @PreAuthorize("hasAuthority('admin:delete')")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+        try {
+            adminService.deleteComment(commentId);
+            log.info("Comment deleted with id: {}", commentId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Error deleting comment: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while processing the request: " + e.getMessage());
+        }
+    }
 }

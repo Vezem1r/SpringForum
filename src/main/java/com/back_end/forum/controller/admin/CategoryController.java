@@ -45,5 +45,4 @@ public class CategoryController {
         log.info("Category list: {}", categories);
         return ResponseEntity.ok(categories);
     }
-
 }

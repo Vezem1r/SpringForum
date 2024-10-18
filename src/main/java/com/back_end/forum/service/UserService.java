@@ -209,15 +209,6 @@ public class UserService {
         return true;
     }
 
-    public User findByUsername(String username) {
-        log.info("Finding user by username: {}", username);
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    log.error("User not found: {}", username);
-                    return new IllegalArgumentException("User not found");
-                });
-    }
-
     public User createGuest() {
         log.info("Creating guest");
         return createUser("Guest", RolesEnum.GUEST);

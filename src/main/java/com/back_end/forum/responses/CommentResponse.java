@@ -20,12 +20,4 @@ public class CommentResponse {
     private int replyCount;
     private List<CommentResponse> replies;
     private List<AttachmentResponse> attachments;
-
-//    public List<CommentResponse> getReplies() {
-//        return replies;
-//    }
-//
-//    public void setReplies(List<CommentResponse> replies) {
-//        this.replies = replies;
-//    }
 }

@@ -1,10 +1,14 @@
 package com.back_end.forum.service.admin;
 
 import com.back_end.forum.dto.AdminPageDto;
+import com.back_end.forum.model.Banner;
+import com.back_end.forum.model.Comment;
+import com.back_end.forum.model.Topic;
 import com.back_end.forum.model.User;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
+import com.back_end.forum.service.BannerService;
 import com.back_end.forum.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,7 @@ public class AdminService {
     private final TopicRepository topicRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+    private final BannerService bannerService;
 
     public AdminPageDto getAdminPage() {
         LocalDateTime todayStart = getStartOfToday();
@@ -74,4 +79,47 @@ public class AdminService {
         return userRepository.save(user);
     }
 
+    public Topic updateTopic(Long topicId, String title, String content, MultipartFile bannerFile, Integer rating) throws IOException {
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new RuntimeException("Topic not found"));
+
+        if (title != null && !title.isEmpty()) {
+            topic.setTitle(title);
+            log.debug("Updating topic title to: {}", title);
+        }
+
+        if (content != null && !content.isEmpty()) {
+            topic.setContent(content);
+            log.debug("Updating topic content");
+        }
+
+        if (bannerFile != null && !bannerFile.isEmpty()) {
+            Banner banner = bannerService.saveBanner(bannerFile);
+            topic.setBanner(banner);
+            log.debug("Updated banner for topic: {}", topic.getTitle());
+        }
+
+        if (rating != null) {
+            topic.setRating(rating);
+            log.debug("Updated rating for topic: {}", topic.getTitle());
+        }
+
+        return topicRepository.save(topic);
+    }
+
+    public void deleteTopic(Long topicId) {
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new RuntimeException("Topic not found"));
+
+        topicRepository.delete(topic);
+        log.info("Deleted topic: {}", topic.getTitle());
+    }
+
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        commentRepository.delete(comment);
+        log.info("Deleted comment with id: {}", commentId);
+    }
 }
