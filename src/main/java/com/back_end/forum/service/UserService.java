@@ -11,7 +11,6 @@ import com.back_end.forum.repository.UserRepository;
 import com.back_end.forum.service.auth.EmailService;
 import com.back_end.forum.utils.FolderUtils;
 import jakarta.mail.MessagingException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -28,10 +28,6 @@ public class AdminController {
 
     //TODO Edit user profile
 
-    //TODO Block user with time
-
-    //TODO Unblock user
-
     //TODO Edit(with rating), delete, topic.
 
     //TODO Edit(with rating), delete, comments.

@@ -26,6 +26,5 @@ public class DataInitializer implements CommandLineRunner {
 
         //Creating Categories
         categoryService.createCategories(10);
-
     }
 }

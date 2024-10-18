@@ -1,6 +1,5 @@
 package com.back_end.forum.controller.pages;
 
-import com.back_end.forum.dto.CommentDto;
 import com.back_end.forum.model.Attachment;
 import com.back_end.forum.responses.CommentResponse;
 import com.back_end.forum.responses.TopicPageResponse;

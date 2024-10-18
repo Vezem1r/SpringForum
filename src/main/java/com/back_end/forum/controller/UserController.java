@@ -5,7 +5,6 @@ import com.back_end.forum.model.User;
 import com.back_end.forum.responses.LoginResponse;
 import com.back_end.forum.service.UserService;
 import com.back_end.forum.service.jwt.JwtService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 @RequestMapping("/users")
 @RestController

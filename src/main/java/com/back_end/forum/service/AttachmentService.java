@@ -5,7 +5,6 @@ import com.back_end.forum.repository.AttachmentRepository;
 import com.back_end.forum.utils.FolderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
