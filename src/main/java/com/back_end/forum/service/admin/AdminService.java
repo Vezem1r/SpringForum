@@ -1,23 +1,29 @@
 package com.back_end.forum.service.admin;
 
 import com.back_end.forum.dto.AdminPageDto;
+import com.back_end.forum.model.User;
 import com.back_end.forum.repository.CommentRepository;
 import com.back_end.forum.repository.TopicRepository;
 import com.back_end.forum.repository.UserRepository;
+import com.back_end.forum.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class AdminService {
 
-    private UserRepository userRepository;
-    private TopicRepository topicRepository;
-    private CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final TopicRepository topicRepository;
+    private final CommentRepository commentRepository;
+    private final UserService userService;
 
     public AdminPageDto getAdminPage() {
         LocalDateTime todayStart = getStartOfToday();
@@ -46,4 +52,26 @@ public class AdminService {
         log.debug("Start of today calculated: {}", todayStart);
         return todayStart;
     }
+
+    public User updateUserProfile(Long userId, String username, MultipartFile avatarFile) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (username != null && !username.isEmpty()) {
+            Optional<User> existingUserUsername = userRepository.findByUsername(username);
+            if (existingUserUsername.isPresent()) {
+                throw new RuntimeException("Username is already taken by another user");
+            }
+            user.setUsername(username);
+            log.debug("Updating username to: {}", username);
+        }
+
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String uploadedAvatar = userService.uploadAvatar(userId, avatarFile);
+            user.setProfilePicture(uploadedAvatar);
+            log.debug("Uploaded avatar: {}", uploadedAvatar);
+        }
+        return userRepository.save(user);
+    }
+
 }
