@@ -44,8 +44,11 @@ public class AuthController {
         User authenticatedUser = authService.authenticate(loginUserDto);
         authenticatedUser.setLastLogin(LocalDateTime.now());
         userRepository.save(authenticatedUser);
-        String jwtToken = jwtService.generateToken(authenticatedUser);
+        String jwtToken = jwtService.generateToken(authenticatedUser, authenticatedUser.getRole().name());
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime(), "Login successful");
+
+        String role = jwtService.extractRole(jwtToken);
+        log.info("Extracted role: {}", role);
         return ResponseEntity.ok(loginResponse);
     }
 

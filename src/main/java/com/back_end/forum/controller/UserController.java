@@ -59,7 +59,7 @@ public class UserController {
         boolean isChanged = userService.changeUsername(currentUser.getUserId(), changeUsernameDto.getNewUsername());
         if (isChanged) {
             currentUser.setUsername(changeUsernameDto.getNewUsername());
-            String newToken = jwtService.generateToken(currentUser);
+            String newToken = jwtService.generateToken(currentUser, currentUser.getRole().name());
             log.info("Username successfully changed to '{}' for user '{}'.", changeUsernameDto.getNewUsername(), currentUser.getUsername());
             LoginResponse loginResponse = new LoginResponse(newToken, jwtService.getExpirationTime(), "Username successfully changed.");
             return ResponseEntity.ok(loginResponse);
