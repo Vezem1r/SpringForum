@@ -4,9 +4,8 @@
 It supports features such as user authentication, real-time communication using **WebSockets**, and the ability to create topics with banners and attachments.
 Additionally, the application utilizes **SMTP** for sending emails, providing users with essential email verification.
 
-- [ ] Add private chat using websocket
-
-![Forum fast :) preview](src/main/resources/preview.gif)
+![Forum fast :) preview](preview.gif)
+![Admin fast :) preview](admin_preview.gif)
 
 ---
 
@@ -35,7 +34,7 @@ This forum application includes various roles, each with different permissions:
   - 👍👎 Can upvote and downvote topics and comments.
   - 👤 Has a personal profile displaying their personal information (email is hidden to other users), topics, and overall rating.
   - ✏️ Can change their username, avatar, and password with email verification.
-  - 📩 ~~Can send messages to different users and receive messages.~~
+  - 📩 Can send messages to different users and receive messages.
   - 🔔 Has personal notifications for:
     - 🆕 New comments on their topics.
     - 📊 Changes in the rating of their topics or comments.
