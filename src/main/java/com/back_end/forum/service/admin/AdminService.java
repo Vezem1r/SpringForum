@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -121,5 +122,13 @@ public class AdminService {
 
         commentRepository.delete(comment);
         log.info("Deleted comment with id: {}", commentId);
+    }
+
+    public void deleteAllReplies(Long commentId) {
+        List<Comment> replies = commentRepository.findByParentComment_CommentId(commentId);
+        for (Comment reply : replies) {
+            deleteAllReplies(reply.getCommentId());
+            commentRepository.delete(reply);
+        }
     }
 }

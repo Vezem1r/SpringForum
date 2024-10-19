@@ -94,6 +94,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('admin:delete')")
     public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
         try {
+            adminService.deleteAllReplies(commentId);
             adminService.deleteComment(commentId);
             log.info("Comment deleted with id: {}", commentId);
             return ResponseEntity.noContent().build();
