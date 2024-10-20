@@ -1,5 +1,6 @@
 package com.back_end.forum.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,5 +26,6 @@ public class ChatRoom {
     private User recipient;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<ChatMessage> messages;
 }

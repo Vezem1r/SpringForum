@@ -1,5 +1,7 @@
 package com.back_end.forum.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +18,7 @@ public class ChatMessage {
 
     @ManyToOne
     @JoinColumn(name = "chat_room_id", nullable = false)
+    @JsonBackReference
     private ChatRoom chatRoom;
 
     @ManyToOne

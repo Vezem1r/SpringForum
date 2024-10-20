@@ -50,8 +50,8 @@ public class SecurityConfig {
             "/uploads/**",
 
 
-            "/connect",
-            "/message/**"
+            "/connect/**",
+            "/message/**",
     };
 
     private final AuthenticationProvider authenticationProvider;
