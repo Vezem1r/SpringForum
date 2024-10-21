@@ -10,6 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
+
     Optional<Rating> findByUserAndTopic(User user, Topic topic);
+
     Optional<Rating> findByUserAndComment(User user, Comment comment);
 }

@@ -48,10 +48,6 @@ public class SecurityConfig {
             "/avatars/**",
             "/banners/**",
             "/uploads/**",
-
-
-            "/connect/**",
-            "/message/**",
     };
 
     private final AuthenticationProvider authenticationProvider;

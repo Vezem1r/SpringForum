@@ -66,9 +66,4 @@ public class Topic {
         attachments.add(attachment);
         attachment.setTopic(this);
     }
-
-    public void updateRating(int value) {
-        this.rating += value;
-    }
-
 }

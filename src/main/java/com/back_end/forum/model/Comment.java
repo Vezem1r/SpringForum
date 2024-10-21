@@ -54,8 +54,4 @@ public class Comment {
         attachments.add(attachment);
         attachment.setComment(this);
     }
-
-    public void updateRating(int value) {
-        this.rating += value;
-    }
 }

@@ -1,6 +1,5 @@
 package com.back_end.forum.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
